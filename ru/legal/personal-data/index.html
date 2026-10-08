@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Уведомление об использовании персональных данных — Parselex</title>
+<meta name="description" content="Как платформа Parselex обрабатывает персональные данные: источники, автоматизированный ИИ-анализ, изоляция корпусов документов и ваши права.">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://docs.parselex.app/ru/legal/personal-data/">
+<link rel="alternate" hreflang="en" href="https://docs.parselex.app/legal/personal-data/">
+<link rel="alternate" hreflang="ru" href="https://docs.parselex.app/ru/legal/personal-data/">
+<link rel="alternate" hreflang="es" href="https://docs.parselex.app/es/legal/personal-data/">
+<link rel="alternate" hreflang="fr" href="https://docs.parselex.app/fr/legal/personal-data/">
+<link rel="alternate" hreflang="hi" href="https://docs.parselex.app/hi/legal/personal-data/">
+<link rel="alternate" hreflang="x-default" href="https://docs.parselex.app/legal/personal-data/">
+<style>
+:root,[data-theme="light"]{--bg-body:#F8F9FB;--bg-card:#FFFFFF;--bg-input:#EDF0F4;--border:#E2E5EB;--text:#1A1D23;--text-2:#5A6070;--muted:#8B919E;--primary:#1B2A4A;--accent:#C9953C;--code:#EDF0F4}
+[data-theme="dark"]{--bg-body:#141821;--bg-card:#1C2030;--bg-input:#2A3040;--border:#2A3040;--text:#E8EAF0;--text-2:#A0A8B8;--muted:#6B7280;--primary:#E8EAF0;--accent:#D4A843;--code:#2A3040}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg-body);color:var(--text);line-height:1.65;font-size:15px}
+.top{background:var(--bg-card);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0}
+.top a{text-decoration:none}
+.brand{display:flex;align-items:center;gap:10px;color:var(--text);font-weight:800;font-size:16px}
+.brand-icon{width:30px;height:30px;border-radius:8px;background:var(--primary);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:15px}
+.back{font-size:13px;color:var(--accent);font-weight:600}
+.wrap{max-width:820px;margin:0 auto;padding:40px 24px 24px}
+h1{font-size:26px;font-weight:800;margin-bottom:6px}
+.updated{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+article h2{font-size:16px;font-weight:800;margin:28px 0 8px;color:var(--text)}
+article p{margin:10px 0;color:var(--text-2)}
+article ul{margin:10px 0 10px 22px;color:var(--text-2)}
+article li{margin:6px 0}
+article a{color:var(--accent);text-decoration:none}
+article a:hover{text-decoration:underline}
+article code{background:var(--code);padding:1px 6px;border-radius:4px;font-size:13px}
+.foot{max-width:820px;margin:36px auto 0;padding:20px 24px 36px;border-top:1px solid var(--border);text-align:center}
+.foot nav{display:flex;gap:8px 20px;justify-content:center;flex-wrap:wrap;font-size:12px;margin-bottom:10px}
+.foot nav a{color:var(--text-2);text-decoration:none;font-weight:500}
+.foot nav a:hover{color:var(--accent)}
+.foot p{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/ru/"><span class="brand-icon">P</span>Parselex</a>
+  <a class="back" href="/ru/">&larr; На главную</a>
+</header>
+<main class="wrap">
+  <article>
+    <h1>Уведомление об использовании персональных данных</h1>
+    
+<p class="updated">Обновлено: 7 октября 2026 г.</p>
+<p>Настоящее уведомление дополняет нашу <a href="/ru/legal/privacy/">Политику
+конфиденциальности</a> и более подробно объясняет, какие категории персональных данных
+обрабатывает платформа Parselex, как работает автоматизированный анализ и какие инструменты
+управления доступны вам.</p>
+
+<h2>1. Категории персональных данных по источникам</h2>
+<ul>
+  <li><strong>Мессенджеры (Telegram, WhatsApp):</strong> содержание сообщений, участники,
+      метки времени и вложения чатов или каналов, приём которых вы поручаете платформе.</li>
+  <li><strong>Электронная почта:</strong> заголовки, текст писем и вложения подключённых вами
+      почтовых ящиков.</li>
+  <li><strong>Облачные диски (например Google Drive):</strong> файлы и метаданные файлов, чтение
+      которых вы нам разрешаете.</li>
+  <li><strong>Телефонные записи:</strong> журналы звонков или экспортированные записи, которые
+      вы предоставляете.</li>
+  <li><strong>Загрузки файлов, API/webhook, судебные источники данных, SFTP, CRM:</strong>
+      документы и связанные с ними метаданные, отправляемые на анализ.</li>
+</ul>
+<p>Мы обрабатываем каждый источник только после его подключения или отправки вами содержимого
+и ограничиваем обработку тем, что необходимо для запрошенного анализа.</p>
+
+<h2>2. Автоматизированная ИИ-обработка</h2>
+<p>Документы проходят через конвейер из семи этапов: приём данных, OCR (распознавание текста),
+классификация, валидация, анализ с retrieval-дополнением (RAG), ИИ-перевод и формирование
+отчётов. Результаты формируются автоматизированными системами и являются
+<strong>вспомогательными</strong>: они не являются юридической консультацией и не создают
+правовых последствий в отношении вас. Мы рекомендуем, прежде чем полагаться на какой-либо
+результат, проверить его у квалифицированного специалиста.</p>
+
+<h2>3. Изоляция корпуса и база знаний</h2>
+<p>Принятое содержимое индексируется в базу знаний с retrieval-поиском (векторное хранилище),
+которая <strong>изолирована на уровне отдельного аккаунта</strong>. Ваш корпус документов не
+объединяется с корпусами других клиентов и не используется для обучения моделей ИИ.</p>
+
+<h2>4. Сторонние провайдеры ИИ и OCR</h2>
+<p>Для выполнения анализа содержимое может передаваться провайдерам больших языковых моделей
+и OCR, выступающим в роли наших обработчиков персональных данных. Мы настраиваем такие сервисы
+так, чтобы, где это поддерживается провайдером, отправленное содержимое не сохранялось для его
+собственных целей. Актуальный список провайдеров предоставляется по запросу через <a href="mailto:contact@parselex.app">contact@parselex.app</a>.</p>
+
+<h2>5. Хранение, минимизация и удаление</h2>
+<p>Мы храним исходные документы и производные артефакты только до тех пор, пока это необходимо
+для ваших активных дел или требуется по закону. Вы можете в любой момент отключить источники;
+отключение прекращает дальнейший приём данных. Вы можете в любое время запросить экспорт или
+удаление своего корпуса документов и персональных данных через <a href="mailto:contact@parselex.app">contact@parselex.app</a>; подтверждённые
+запросы исполняются в установленные законом сроки.</p>
+
+<h2>6. Меры безопасности</h2>
+<p>Шифрование при передаче (TLS), аутентификация на всех прикладных интерфейсах, изоляция
+корпуса на уровне отдельного аккаунта, ролевой контроль доступа и защита сервисных API
+bearer-токенами.</p>
+
+<h2>7. Вопросы</h2>
+<p>Любые вопросы об этом уведомлении или о том, как используются ваши персональные данные:
+<a href="mailto:contact@parselex.app">contact@parselex.app</a>.</p>
+
+  </article>
+</main>
+<div class="foot">
+  <nav aria-label="Legal">
+    <a href="/ru/legal/privacy/">Конфиденциальность</a>
+    <a href="/ru/legal/personal-data/">Использование персональных данных</a>
+    <a href="/ru/legal/cookies/">Cookies</a>
+    <a href="/ru/legal/terms/">Условия использования</a>
+    <a href="/ru/legal/payments/">Регулярные платежи</a>
+    <a href="/ru/legal/disclaimer/">Дисклеймер ИИ</a>
+    <a href="/ru/security/">Безопасность</a>
+    <a href="mailto:contact@parselex.app">Поддержка: contact@parselex.app</a>
+  </nav>
+  <p>&copy; 2026 <a href="/ru/" style="color:var(--accent);text-decoration:none;font-weight:600">Parselex</a> &mdash; Платформа интеллектуального анализа юридических документов</p>
+</div>
+<script>
+(function(){
+  var saved=null;
+  try{saved=localStorage.getItem('theme');}catch(e){}
+  if(!saved)saved=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+  document.documentElement.setAttribute('data-theme',saved);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Arquitectura de seguridad — Parselex</title>
+<meta name="description" content="Cómo Parselex aplica aislamiento de red Zero-Trust, anonimización de datos personales en el dispositivo (edge) y procesamiento efímero para proteger los datos amparados por el privilegio abogado-cliente.">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://docs.parselex.app/es/security/">
+<link rel="alternate" hreflang="en" href="https://docs.parselex.app/security/">
+<link rel="alternate" hreflang="ru" href="https://docs.parselex.app/ru/security/">
+<link rel="alternate" hreflang="es" href="https://docs.parselex.app/es/security/">
+<link rel="alternate" hreflang="fr" href="https://docs.parselex.app/fr/security/">
+<link rel="alternate" hreflang="hi" href="https://docs.parselex.app/hi/security/">
+<link rel="alternate" hreflang="x-default" href="https://docs.parselex.app/security/">
+<style>
+:root,[data-theme="light"]{--bg-body:#F8F9FB;--bg-card:#FFFFFF;--bg-input:#EDF0F4;--border:#E2E5EB;--text:#1A1D23;--text-2:#5A6070;--muted:#8B919E;--primary:#1B2A4A;--accent:#C9953C;--code:#EDF0F4}
+[data-theme="dark"]{--bg-body:#141821;--bg-card:#1C2030;--bg-input:#2A3040;--border:#2A3040;--text:#E8EAF0;--text-2:#A0A8B8;--muted:#6B7280;--primary:#E8EAF0;--accent:#D4A843;--code:#2A3040}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg-body);color:var(--text);line-height:1.65;font-size:15px}
+.top{background:var(--bg-card);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0}
+.top a{text-decoration:none}
+.brand{display:flex;align-items:center;gap:10px;color:var(--text);font-weight:800;font-size:16px}
+.brand-icon{width:30px;height:30px;border-radius:8px;background:var(--primary);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:15px}
+.back{font-size:13px;color:var(--accent);font-weight:600}
+.wrap{max-width:820px;margin:0 auto;padding:40px 24px 24px}
+h1{font-size:26px;font-weight:800;margin-bottom:6px}
+.updated{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+article h2{font-size:16px;font-weight:800;margin:28px 0 8px;color:var(--text)}
+article p{margin:10px 0;color:var(--text-2)}
+article ul{margin:10px 0 10px 22px;color:var(--text-2)}
+article li{margin:6px 0}
+article a{color:var(--accent);text-decoration:none}
+article a:hover{text-decoration:underline}
+article code{background:var(--code);padding:1px 6px;border-radius:4px;font-size:13px}
+.foot{max-width:820px;margin:36px auto 0;padding:20px 24px 36px;border-top:1px solid var(--border);text-align:center}
+.foot nav{display:flex;gap:8px 20px;justify-content:center;flex-wrap:wrap;font-size:12px;margin-bottom:10px}
+.foot nav a{color:var(--text-2);text-decoration:none;font-weight:500}
+.foot nav a:hover{color:var(--accent)}
+.foot p{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/es/"><span class="brand-icon">P</span>Parselex</a>
+  <a class="back" href="/es/">&larr; Volver al inicio</a>
+</header>
+<main class="wrap">
+  <article>
+    <h1>Arquitectura de seguridad</h1>
+    <p class="updated">Última actualización: 7 de octubre de 2026</p>
+<p><strong>Seguridad por arquitectura, no por promesa.</strong> Parselex está construido sobre una red mesh Zero-Trust (confianza cero) diseñada para los requisitos éticos y de cumplimiento normativo del ejercicio de la abogacía. Esta página describe los mecanismos concretos que protegen los datos amparados por el privilegio abogado-cliente &#8212; lo que nuestra arquitectura hace, y lo que deja deliberadamente en manos del usuario.</p>
+
+<h2>1. Aislamiento de red (LexConnect)</h2>
+<p>Los espacios de trabajo de Parselex no existen en el internet público. El acceso se gestiona exclusivamente a través de <strong>LexConnect</strong>, nuestro cliente de red Zero-Trust, que establece un túnel mesh cifrado entre un dispositivo autenticado y el espacio de trabajo. Nuestros nodos de inferencia carecen de direcciones IP públicas, lo que los hace invisibles ante el escaneo a escala de internet y la actividad DDoS. No hay puertos expuestos ni puntos de entrada compartidos: cada conexión es un túnel cifrado punto a punto, y los derechos de acceso siguen el principio de mínimo privilegio.</p>
+
+<h2>2. Anonimización de datos personales en el dispositivo (edge): el cortafuegos ético</h2>
+<p>Antes de que un documento salga de su dispositivo, el cliente LexConnect puede eliminar la información personal identificable y reemplazarla por tokens deterministas: el nombre de un cliente se convierte en <code>[PERSON_1]</code>, una parte contraria se convierte en <code>[ENTITY_A]</code>, y los identificadores como un número de la seguridad social o de una cuenta bancaria se convierten en <code>[REDACTED_SSN]</code> o <code>[REDACTED_ACCOUNT]</code>. Solo el texto despersonalizado entra en el túnel cifrado, de modo que nuestros motores de inferencia razonan sobre la estructura y la lógica de un asunto sin ver jamás las identidades confidenciales que hay detrás. En el camino de retorno, el cliente reensambla las identidades originales localmente, y el documento terminado se muestra completo.</p>
+<p>Como las identidades se despersonalizan en el borde, los servidores procesan tokens sanitizados en lugar de datos personales. Este diseño respalda el estándar de los «esfuerzos razonables» que las normas de conducta profesional exigen cuando se maneja información confidencial de clientes, y reduce la exposición del despacho en materia de protección de datos al trabajar bajo regímenes como el GDPR o el CCPA. Un diccionario personalizado de etiquetas de entidades (por ejemplo, marcar a una parte como <code>[CLIENT]</code> y a otra como <code>[OPPOSING_COUNSEL]</code>) conserva las distinciones que la IA necesita para producir un trabajo correcto.</p>
+
+<h2>3. Soberanía de los datos y procesamiento efímero</h2>
+<p>Sus expedientes nunca entrenan un modelo público &#8212; sin excepciones. Las consultas y los documentos se procesan en sesiones efímeras: el contexto de trabajo existe en memoria mientras dura la sesión y se descarta cuando esta se cierra. No registramos el contenido de las consultas, y no conservamos los documentos después del procesamiento. La propiedad intelectual de su despacho sigue siendo de su despacho.</p>
+
+<h2>4. Estado del dispositivo e identidad</h2>
+<p>El acceso exige más que una contraseña. El cliente LexConnect realiza la verificación del estado del dispositivo, exige inicio de sesión único (SSO) con autenticación multifactor (MFA), incluidos Microsoft Entra ID y Okta, y corta el túnel automáticamente si un dispositivo no supera una comprobación de estado, se conecta desde una red no confiable o aparece desde una jurisdicción no autorizada. Las sesiones son efímeras por diseño: al cerrar el cliente, el túnel se desmonta.</p>
+
+<h2>5. Auditoría de acceso sin registro de contenido</h2>
+<p>Para la supervisión de seguridad y la facturación, registramos quién se conectó, desde qué clase de dispositivo y cuándo. No registramos la carga útil. Los metadatos de conexión y el contenido de la sesión están criptográficamente separados, de modo que un registro de acceso nunca puede reconstruirse como una transcripción de trabajo privilegiado.</p>
+
+<h2>6. Nuestro modelo de amenazas</h2>
+<p>Publicamos contra qué protege nuestra arquitectura &#8212; y qué sigue siendo responsabilidad del usuario &#8212; porque la transparencia vale más que una insignia.</p>
+<p><strong>Protege contra:</strong></p>
+<ul>
+  <li>Intercepción man-in-the-middle del tráfico entre el cliente y el espacio de trabajo;</li>
+  <li>Observación pasiva del contenido de los documentos por parte de la red o del ISP;</li>
+  <li>Escaneo a escala de internet y DDoS contra la infraestructura de inferencia (sin puntos finales públicos);</li>
+  <li>Raspado de datos en la nube pública, porque el contenido del espacio de trabajo no se aloja en servicios de nube pública compartidos;</li>
+  <li>Llamadas salientes no autorizadas del cliente de IA hacia servicios de terceros, bloqueadas en la capa DNS.</li>
+</ul>
+<p><strong>Fuera de nuestro control (responsabilidad del usuario):</strong></p>
+<ul>
+  <li>Un dispositivo desbloqueado y sin supervisión;</li>
+  <li>Un sistema operativo comprometido o malware en el punto final del abogado;</li>
+  <li>Phishing de las credenciales del despacho de un abogado (mitigado, no eliminado, por la autenticación multifactor);</li>
+  <li>Internos autorizados que actúan dentro de sus permisos;</li>
+  <li>Captura de pantalla o fotografía de la pantalla por parte de una persona con acceso legítimo.</li>
+</ul>
+
+<h2>7. El cliente LexConnect</h2>
+<p>LexConnect inicia sesión contra un espacio de trabajo del despacho, verifica el dispositivo y mantiene el túnel cifrado mientras se utiliza Parselex. Aplica un filtrado a nivel de DNS orientado a la prevención de pérdida de datos (DLP) para evitar la exfiltración accidental hacia API de terceros no autorizadas, y desmonta la sesión en el momento en que se incumple una política. Para abogados independientes y despachos pequeños, Parselex se está ampliando para admitir un despliegue de infraestructura propia: el espacio de trabajo se ejecuta en la cuenta de nube del propio despacho y LexConnect proporciona la capa segura superpuesta, de modo que la soberanía de los datos no dependa en absoluto de nuestro alojamiento.</p>
+
+<h2>8. Preguntas de seguridad</h2>
+<p>Para informar de una vulnerabilidad, solicitar nuestra documentación de seguridad o plantear una pregunta sobre esta página, escriba a <a href="mailto:contact@parselex.app">contact@parselex.app</a>. Tratamos los informes de divulgación responsable con prioridad y acusamos recibo de cada informe.</p>
+  </article>
+</main>
+<div class="foot">
+  <nav aria-label="Legal">
+    <a href="/es/legal/privacy/">Privacidad</a>
+    <a href="/es/legal/personal-data/">Uso de datos personales</a>
+    <a href="/es/legal/cookies/">Cookies</a>
+    <a href="/es/legal/terms/">Términos del servicio</a>
+    <a href="/es/legal/payments/">Pagos recurrentes</a>
+    <a href="/es/legal/disclaimer/">Descargo de responsabilidad de IA</a>
+    <a href="/es/security/">Seguridad</a>
+    <a href="mailto:contact@parselex.app">Soporte: contact@parselex.app</a>
+  </nav>
+  <p>&copy; 2026 <a href="/es/" style="color:var(--accent);text-decoration:none;font-weight:600">Parselex</a> &mdash; Plataforma de Inteligencia Documental Legal</p>
+</div>
+<script>
+(function(){
+  var saved=null;
+  try{saved=localStorage.getItem('theme');}catch(e){}
+  if(!saved)saved=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+  document.documentElement.setAttribute('data-theme',saved);
+})();
+</script>
+</body>
+</html>

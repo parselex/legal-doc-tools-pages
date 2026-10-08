@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Архитектура безопасности — Parselex</title>
+<meta name="description" content="Как Parselex обеспечивает сетевую изоляцию Zero-Trust, редактирование персональных данных на стороне устройства (edge-side) и эфемерную обработку для защиты данных, на которые распространяется адвокатская тайна.">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://docs.parselex.app/ru/security/">
+<link rel="alternate" hreflang="en" href="https://docs.parselex.app/security/">
+<link rel="alternate" hreflang="ru" href="https://docs.parselex.app/ru/security/">
+<link rel="alternate" hreflang="es" href="https://docs.parselex.app/es/security/">
+<link rel="alternate" hreflang="fr" href="https://docs.parselex.app/fr/security/">
+<link rel="alternate" hreflang="hi" href="https://docs.parselex.app/hi/security/">
+<link rel="alternate" hreflang="x-default" href="https://docs.parselex.app/security/">
+<style>
+:root,[data-theme="light"]{--bg-body:#F8F9FB;--bg-card:#FFFFFF;--bg-input:#EDF0F4;--border:#E2E5EB;--text:#1A1D23;--text-2:#5A6070;--muted:#8B919E;--primary:#1B2A4A;--accent:#C9953C;--code:#EDF0F4}
+[data-theme="dark"]{--bg-body:#141821;--bg-card:#1C2030;--bg-input:#2A3040;--border:#2A3040;--text:#E8EAF0;--text-2:#A0A8B8;--muted:#6B7280;--primary:#E8EAF0;--accent:#D4A843;--code:#2A3040}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg-body);color:var(--text);line-height:1.65;font-size:15px}
+.top{background:var(--bg-card);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0}
+.top a{text-decoration:none}
+.brand{display:flex;align-items:center;gap:10px;color:var(--text);font-weight:800;font-size:16px}
+.brand-icon{width:30px;height:30px;border-radius:8px;background:var(--primary);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:15px}
+.back{font-size:13px;color:var(--accent);font-weight:600}
+.wrap{max-width:820px;margin:0 auto;padding:40px 24px 24px}
+h1{font-size:26px;font-weight:800;margin-bottom:6px}
+.updated{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+article h2{font-size:16px;font-weight:800;margin:28px 0 8px;color:var(--text)}
+article p{margin:10px 0;color:var(--text-2)}
+article ul{margin:10px 0 10px 22px;color:var(--text-2)}
+article li{margin:6px 0}
+article a{color:var(--accent);text-decoration:none}
+article a:hover{text-decoration:underline}
+article code{background:var(--code);padding:1px 6px;border-radius:4px;font-size:13px}
+.foot{max-width:820px;margin:36px auto 0;padding:20px 24px 36px;border-top:1px solid var(--border);text-align:center}
+.foot nav{display:flex;gap:8px 20px;justify-content:center;flex-wrap:wrap;font-size:12px;margin-bottom:10px}
+.foot nav a{color:var(--text-2);text-decoration:none;font-weight:500}
+.foot nav a:hover{color:var(--accent)}
+.foot p{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/ru/"><span class="brand-icon">P</span>Parselex</a>
+  <a class="back" href="/ru/">&larr; На главную</a>
+</header>
+<main class="wrap">
+  <article>
+    <h1>Архитектура безопасности</h1>
+    
+<p class="updated">Обновлено: 7 октября 2026 г.</p>
+<p><strong>Безопасность за счёт архитектуры, а не обещаний.</strong> Parselex — это Zero-Trust mesh-сеть, спроектированная с учётом этических и комплаенс-требований юридической практики. На этой странице описаны конкретные механизмы, защищающие данные, на которые распространяется адвокатская тайна, — то, что делает наша архитектура, и то, что она сознательно оставляет на усмотрение пользователя.</p>
+
+<h2>1. Сетевая изоляция (LexConnect)</h2>
+<p>Рабочие пространства Parselex не существуют в публичном интернете. Доступ предоставляется исключительно через <strong>LexConnect</strong> — наш Zero-Trust сетевой клиент, который устанавливает зашифрованный mesh-туннель между аутентифицированным устройством и рабочим пространством. Наши узлы инференса не имеют публичных IP-адресов, что делает их невидимыми для сканирования всего интернета и DDoS-активности. Нет ни открытых портов, ни общих точек входа: каждое соединение — отдельный зашифрованный туннель «точка-точка», а в основе прав доступа лежит принцип минимальных привилегий.</p>
+
+<h2>2. Редактирование персональных данных на стороне устройства (edge-side) — Этический брандмауэр</h2>
+<p>Прежде чем документ покинет ваше устройство, клиент LexConnect может удалить персональные данные (PII) и заменить их на детерминированные токены: имя клиента превращается в <code>[PERSON_1]</code>, контрагент — в <code>[ENTITY_A]</code>, а идентификаторы вроде номера социального страхования или банковского счёта — в <code>[REDACTED_SSN]</code> или <code>[REDACTED_ACCOUNT]</code>. В зашифрованный туннель попадает только санитизированный текст, поэтому наши движки инференса рассуждают о структуре и логике дела, так и не увидев скрытых за ним конфиденциальных идентификаторов. На обратном пути клиент локально восстанавливает исходные данные, и готовый документ отображается в полном виде.</p>
+<p>Поскольку идентификаторы редактируются на стороне устройства (edge-side), серверы обрабатывают санитизированные токены, а не реальные персональные данные. Такая архитектура отвечает стандарту «разумных усилий», которого правила профессиональной этики ожидают при работе с конфиденциальной информацией клиентов, и снижает риски фирмы в области защиты данных при работе в таких режимах, как GDPR или CCPA. Настраиваемый словарь тегов сущностей (например, с пометкой одной стороны как <code>[CLIENT]</code>, а другой — как <code>[OPPOSING_COUNSEL]</code>) сохраняет смысловые различия между участниками, которые необходимы ИИ для создания корректного рабочего результата.</p>
+
+<h2>3. Суверенитет данных и эфемерная обработка</h2>
+<p>Ваши материалы дел никогда не обучают публичную модель — точка. Запросы и документы проходят через эфемерные сессии: рабочий контекст существует в памяти только на протяжении сессии и уничтожается при её закрытии. Мы не журналируем содержание запросов и не храним документы после обработки. Интеллектуальная собственность вашей фирмы остаётся интеллектуальной собственностью вашей фирмы.</p>
+
+<h2>4. Проверка состояния устройства и идентификация</h2>
+<p>Доступ требует большего, чем просто пароль. Клиент LexConnect проверяет работоспособность устройства, применяет единый вход (SSO) с многофакторной аутентификацией (MFA) — включая Microsoft Entra ID и Okta — и автоматически разрывает туннель, если устройство не проходит проверку состояния устройства, подключается из недоверенной сети или появляется из несанкционированной юрисдикции. Сессии эфемерны по замыслу: закрытие клиента немедленно разрывает туннель.</p>
+
+<h2>5. Аудит доступа без журналирования содержимого</h2>
+<p>Для мониторинга безопасности и выставления счетов мы фиксируем, кто подключался, с какого класса устройств и когда. Мы не фиксируем полезную нагрузку. Метаданные соединения и содержание сессии криптографически разделены, поэтому журнал доступа никогда не может быть восстановлен в виде стенограммы конфиденциальной работы.</p>
+
+<h2>6. Наша модель угроз</h2>
+<p>Мы публикуем, от чего защищает наша архитектура, — и что остаётся зоной ответственности пользователя, — потому что прозрачность ценнее любого значка.</p>
+<p><strong>Защищает от:</strong></p>
+<ul>
+  <li>Перехват трафика «человек посередине» (man-in-the-middle) между клиентом и рабочим пространством;</li>
+  <li>Пассивное наблюдение за содержанием документов со стороны сети или интернет-провайдера (ISP);</li>
+  <li>Сканирование всего интернета и DDoS-атаки на инфраструктуру инференса (публичные конечные точки отсутствуют);</li>
+  <li>Сбор данных из публичных облаков, поскольку содержимое рабочих пространств не размещается на общедоступных облачных сервисах;</li>
+  <li>Несанкционированные исходящие вызовы от ИИ-клиента к сторонним сервисам, блокируемые на уровне DNS.</li>
+</ul>
+<p><strong>Вне нашего контроля (зона ответственности пользователя):</strong></p>
+<ul>
+  <li>Устройство, оставленное без присмотра с незаблокированным экраном;</li>
+  <li>Скомпрометированная операционная система или вредоносное ПО на устройстве юриста;</li>
+  <li>Фишинг учётных данных юриста (многофакторная аутентификация снижает этот риск, но не устраняет его);</li>
+  <li>Авторизованные инсайдеры, действующие в пределах своих полномочий;</li>
+  <li>Съёмка экрана или фотографирование дисплея лицом, имеющим законный доступ.</li>
+</ul>
+
+<h2>7. Клиент LexConnect</h2>
+<p>LexConnect выполняет вход в рабочее пространство фирмы, проверяет устройство и поддерживает зашифрованный туннель, пока используется Parselex. Он применяет фильтрацию на уровне DNS, чтобы предотвратить случайную утечку данных в несанкционированные сторонние API, и немедленно завершает сессию при первом же нарушении политики. Для практикующих индивидуально и небольших фирм Parselex расширяется в сторону развёртывания на собственной инфраструктуре (bring-your-own-infrastructure): рабочее пространство работает в облачном аккаунте самой фирмы, а LexConnect предоставляет защищённую надстройку, так что суверенитет данных вообще не зависит от нашего хостинга.</p>
+
+<h2>8. Вопросы безопасности</h2>
+<p>Чтобы сообщить об уязвимости, запросить нашу документацию по безопасности или задать вопрос об этой странице, напишите на <a href="mailto:contact@parselex.app">contact@parselex.app</a>. Мы рассматриваем сообщения об ответственном раскрытии уязвимостей в приоритетном порядке и подтверждаем получение каждого отчёта.</p>
+  </article>
+</main>
+<div class="foot">
+  <nav aria-label="Legal">
+    <a href="/ru/legal/privacy/">Конфиденциальность</a>
+    <a href="/ru/legal/personal-data/">Использование персональных данных</a>
+    <a href="/ru/legal/cookies/">Cookies</a>
+    <a href="/ru/legal/terms/">Условия использования</a>
+    <a href="/ru/legal/payments/">Регулярные платежи</a>
+    <a href="/ru/legal/disclaimer/">Дисклеймер ИИ</a>
+    <a href="/ru/security/">Безопасность</a>
+    <a href="mailto:contact@parselex.app">Поддержка: contact@parselex.app</a>
+  </nav>
+  <p>&copy; 2026 <a href="/ru/" style="color:var(--accent);text-decoration:none;font-weight:600">Parselex</a> &mdash; Платформа интеллектуального анализа юридических документов</p>
+</div>
+<script>
+(function(){
+  var saved=null;
+  try{saved=localStorage.getItem('theme');}catch(e){}
+  if(!saved)saved=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+  document.documentElement.setAttribute('data-theme',saved);
+})();
+</script>
+</body>
+</html>

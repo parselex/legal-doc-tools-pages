@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>सुरक्षा आर्किटेक्चर — Parselex</title>
+<meta name="description" content="Parselex ज़ीरो-ट्रस्ट नेटवर्क आइसोलेशन, एज (डिवाइस) पर व्यक्तिगत डेटा (PII) रिडैक्शन और एफ़ेमेरल (क्षणिक) प्रोसेसिंग के माध्यम से अधिवक्ता—ग्राहक विशेषाधिकार के अंतर्गत आने वाले डेटा की रक्षा कैसे करता है।">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://docs.parselex.app/hi/security/">
+<link rel="alternate" hreflang="en" href="https://docs.parselex.app/security/">
+<link rel="alternate" hreflang="ru" href="https://docs.parselex.app/ru/security/">
+<link rel="alternate" hreflang="es" href="https://docs.parselex.app/es/security/">
+<link rel="alternate" hreflang="fr" href="https://docs.parselex.app/fr/security/">
+<link rel="alternate" hreflang="hi" href="https://docs.parselex.app/hi/security/">
+<link rel="alternate" hreflang="x-default" href="https://docs.parselex.app/security/">
+<style>
+:root,[data-theme="light"]{--bg-body:#F8F9FB;--bg-card:#FFFFFF;--bg-input:#EDF0F4;--border:#E2E5EB;--text:#1A1D23;--text-2:#5A6070;--muted:#8B919E;--primary:#1B2A4A;--accent:#C9953C;--code:#EDF0F4}
+[data-theme="dark"]{--bg-body:#141821;--bg-card:#1C2030;--bg-input:#2A3040;--border:#2A3040;--text:#E8EAF0;--text-2:#A0A8B8;--muted:#6B7280;--primary:#E8EAF0;--accent:#D4A843;--code:#2A3040}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg-body);color:var(--text);line-height:1.65;font-size:15px}
+.top{background:var(--bg-card);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0}
+.top a{text-decoration:none}
+.brand{display:flex;align-items:center;gap:10px;color:var(--text);font-weight:800;font-size:16px}
+.brand-icon{width:30px;height:30px;border-radius:8px;background:var(--primary);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:15px}
+.back{font-size:13px;color:var(--accent);font-weight:600}
+.wrap{max-width:820px;margin:0 auto;padding:40px 24px 24px}
+h1{font-size:26px;font-weight:800;margin-bottom:6px}
+.updated{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+article h2{font-size:16px;font-weight:800;margin:28px 0 8px;color:var(--text)}
+article p{margin:10px 0;color:var(--text-2)}
+article ul{margin:10px 0 10px 22px;color:var(--text-2)}
+article li{margin:6px 0}
+article a{color:var(--accent);text-decoration:none}
+article a:hover{text-decoration:underline}
+article code{background:var(--code);padding:1px 6px;border-radius:4px;font-size:13px}
+.foot{max-width:820px;margin:36px auto 0;padding:20px 24px 36px;border-top:1px solid var(--border);text-align:center}
+.foot nav{display:flex;gap:8px 20px;justify-content:center;flex-wrap:wrap;font-size:12px;margin-bottom:10px}
+.foot nav a{color:var(--text-2);text-decoration:none;font-weight:500}
+.foot nav a:hover{color:var(--accent)}
+.foot p{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/hi/"><span class="brand-icon">P</span>Parselex</a>
+  <a class="back" href="/hi/">&larr; मुखपृष्ठ पर लौटें</a>
+</header>
+<main class="wrap">
+  <article>
+    <h1>सुरक्षा आर्किटेक्चर</h1>
+    <p class="updated">अंतिम अद्यतन: 7 अक्टूबर 2026</p>
+<p><strong>सुरक्षा वादे से नहीं, आर्किटेक्चर से।</strong> Parselex एक ज़ीरो-ट्रस्ट (Zero-Trust) मेश नेटवर्क पर निर्मित है, जिसे कानूनी व्यवसाय की नैतिक और अनुपालन आवश्यकताओं को ध्यान में रखकर डिज़ाइन किया गया है। यह पृष्ठ उन ठोस तंत्रों का वर्णन करता है जो अधिवक्ता—ग्राहक विशेषाधिकार के अंतर्गत आने वाले डेटा की रक्षा करते हैं &#8212; हमारा आर्किटेक्चर क्या करता है, और क्या जानबूझकर उपयोगकर्ता पर छोड़ा जाता है।</p>
+
+<h2>1. नेटवर्क आइसोलेशन (LexConnect)</h2>
+<p>Parselex के वर्कस्पेस सार्वजनिक इंटरनेट पर मौजूद नहीं होते। पहुँच केवल हमारे ज़ीरो-ट्रस्ट नेटवर्क क्लाइंट <strong>LexConnect</strong> के माध्यम से ही मिलती है, जो प्रमाणित डिवाइस और वर्कस्पेस के बीच एक एन्क्रिप्टेड मेश टनल स्थापित करता है। हमारे इन्फ़रेंस नोड्स के पास कोई सार्वजनिक IP पते नहीं होते, जिससे वे इंटरनेट-व्यापी स्कैनिंग और DDoS गतिविधि के लिए अदृश्य रहते हैं। न कोई खुला पोर्ट है और न ही कोई साझा प्रवेश बिंदु: प्रत्येक कनेक्शन एक पॉइंट-टू-पॉइंट एन्क्रिप्टेड टनल है, और एक्सेस अधिकार न्यूनतम-विशेषाधिकार सिद्धांत का पालन करते हैं।</p>
+
+<h2>2. एज (डिवाइस) पर व्यक्तिगत डेटा (PII) रिडैक्शन (नैतिक फ़ायरवॉल)</h2>
+<p>कोई दस्तावेज़ आपके डिवाइस से निकलने से पहले, LexConnect क्लाइंट व्यक्तिगत पहचान योग्य जानकारी हटा सकता है और उसे डिटरमिनिस्टिक टोकन से बदल सकता है: ग्राहक का नाम <code>[PERSON_1]</code> बन जाता है, कोई प्रतिपक्षी <code>[ENTITY_A]</code> बन जाता है, और सामाजिक-सुरक्षा या बैंक खाता संख्या जैसे पहचानक <code>[REDACTED_SSN]</code> या <code>[REDACTED_ACCOUNT]</code> बन जाते हैं। केवल सैनिटाइज़्ड टेक्स्ट ही एन्क्रिप्टेड टनल में प्रवेश करता है, इसलिए हमारे इन्फ़रेंस इंजन किसी मामले की संरचना और तर्क पर विचार करते हैं, बिना उसके पीछे की गोपनीय पहचानों को कभी देखे। वापसी के मार्ग पर क्लाइंट मूल पहचानों को स्थानीय रूप से पुनः जोड़ता है, और तैयार दस्तावेज़ पूर्ण रूप में दिखाया जाता है।</p>
+<p>चूँकि पहचानें एज (डिवाइस) पर ही रिडैक्ट की जाती हैं, सर्वर व्यक्तिगत डेटा के स्थान पर सैनिटाइज़्ड टोकन प्रोसेस करते हैं। यह डिज़ाइन उस &ldquo;उचित प्रयास&rdquo; मानक का समर्थन करता है जिसकी अपेक्षा व्यावसायिक आचरण के नियम गोपनीय ग्राहक जानकारी के प्रबंधन में करते हैं, और यह GDPR या CCPA जैसी व्यवस्थाओं के अंतर्गत कार्य करते समय फ़र्म के डेटा-संरक्षण जोखिम को घटाता है। एंटिटी टैग का अनुकूलित शब्दकोश (उदाहरण के लिए, एक पक्ष को <code>[CLIENT]</code> और किसी दूसरे को <code>[OPPOSING_COUNSEL]</code> के रूप में चिह्नित करना) वे भेद बनाए रखता है जिनकी एआई को सही कार्य-उत्पाद तैयार करने हेतु आवश्यकता होती है।</p>
+
+<h2>3. डेटा संप्रभुता और एफ़ेमेरल (क्षणिक) प्रोसेसिंग</h2>
+<p>आपकी केस फ़ाइलें कभी किसी सार्वजनिक मॉडल को प्रशिक्षित नहीं करतीं &#8212; बिना किसी अपवाद के। प्रॉम्प्ट और दस्तावेज़ एफ़ेमेरल (क्षणिक) सेशन में प्रोसेस होते हैं: कार्य-संदर्भ सेशन की अवधि तक मेमोरी में रहता है और सेशन बंद होने पर त्याग दिया जाता है। हम प्रॉम्प्ट की सामग्री लॉग नहीं करते, और प्रोसेसिंग के बाद दस्तावेज़ रखते नहीं। आपकी फ़र्म की बौद्धिक संपदा आपकी फ़र्म की बौद्धिक संपदा ही रहती है।</p>
+
+<h2>4. डिवाइस पोस्चर और पहचान</h2>
+<p>पहुँच के लिए केवल पासवर्ड पर्याप्त नहीं है। LexConnect क्लाइंट डिवाइस के स्वास्थ्य की जाँच करता है, मल्टी-फैक्टर प्रमाणीकरण युक्त सिंगल साइन-ऑन (SSO/MFA) लागू करता है (Microsoft Entra ID और Okta सहित), और यदि कोई डिवाइस डिवाइस पोस्चर जाँच में विफल होता है, अविश्वसनीय नेटवर्क से कनेक्ट होता है, या अनधिकृत क्षेत्राधिकार से जुड़ा दिखता है, तो टनल को स्वतः काट देता है। सेशन डिज़ाइन से ही एफ़ेमेरल (क्षणिक) होते हैं: क्लाइंट बंद करते ही टनल समाप्त हो जाता है।</p>
+
+<h2>5. सामग्री लॉगिंग के बिना एक्सेस ऑडिटिंग</h2>
+<p>सुरक्षा निगरानी और बिलिंग हेतु हम रिकॉर्ड करते हैं कि कौन जुड़ा, किस श्रेणी के डिवाइस से, और कब। हम पेलोड रिकॉर्ड नहीं करते। कनेक्शन मेटाडेटा और सेशन सामग्री क्रिप्टोग्राफ़िक रूप से पृथक रहते हैं, इसलिए किसी एक्सेस लॉग को विशेषाधिकार-प्राप्त कार्य की प्रतिलिपि में कभी नहीं बदला जा सकता।</p>
+
+<h2>6. हमारा थ्रेट मॉडल</h2>
+<p>हम यह प्रकाशित करते हैं कि हमारा आर्किटेक्चर किन ख़तरों से रक्षा करता है &#8212; और क्या उपयोगकर्ता की ज़िम्मेदारी बना रहता है &#8212; क्योंकि पारदर्शिता किसी बैज से अधिक मूल्यवान है।</p>
+<p><strong>जिनसे रक्षा की जाती है:</strong></p>
+<ul>
+  <li>क्लाइंट और वर्कस्पेस के बीच ट्रैफ़िक का मैन-इन-द-मिडिल अंतर्ग्रहण;</li>
+  <li>दस्तावेज़ सामग्री पर नेटवर्क या ISP की निष्क्रिय निगरानी;</li>
+  <li>इन्फ़रेंस अवसंरचना के विरुद्ध इंटरनेट-व्यापी स्कैनिंग और DDoS (कोई सार्वजनिक एंडपॉइंट नहीं);</li>
+  <li>सार्वजनिक-क्लाउड डेटा स्क्रैपिंग, क्योंकि वर्कस्पेस सामग्री साझा सार्वजनिक क्लाउड सेवाओं पर होस्ट नहीं की जाती;</li>
+  <li>एआई क्लाइंट द्वारा तृतीय-पक्ष सेवाओं को की जाने वाली अनधिकृत आउटबाउंड कॉल, जिन्हें DNS परत पर रोका जाता है।</li>
+</ul>
+<p><strong>जो हमारे नियंत्रण से बाहर है (उपयोगकर्ता की ज़िम्मेदारी):</strong></p>
+<ul>
+  <li>अनलॉक और बिना निगरानी छोड़ा गया कोई डिवाइस;</li>
+  <li>अधिवक्ता के एंडपॉइंट पर कंप्रोमाइज़्ड (छेड़ा हुआ) ऑपरेटिंग सिस्टम या मैलवेयर;</li>
+  <li>अधिवक्ता की फ़र्म क्रेडेंशियल का फ़िशिंग (मल्टी-फैक्टर प्रमाणीकरण से घटाया जाता है, समाप्त नहीं);</li>
+  <li>अपनी अनुमतियों के भीतर कार्य करते अधिकृत इनसाइडर;</li>
+  <li>वैध पहुँच रखने वाले व्यक्ति द्वारा डिस्प्ले का स्क्रीन कैप्चर या फ़ोटोग्राफ़ी।</li>
+</ul>
+
+<h2>7. LexConnect क्लाइंट</h2>
+<p>LexConnect फ़र्म वर्कस्पेस के विरुद्ध साइन इन करता है, डिवाइस सत्यापित करता है, और Parselex के उपयोग के दौरान एन्क्रिप्टेड टनल बनाए रखता है। यह DNS परत पर फ़िल्टरिंग लागू करता है ताकि अनधिकृत तृतीय-पक्ष API की ओर आकस्मिक डेटा निकासी (एक्सफ़िल्ट्रेशन) रोकी जा सके, और नीति भंग होते ही सेशन समाप्त कर देता है। सोलो प्रैक्टिशनरों और छोटी फ़र्मों हेतु Parselex को bring-your-own-infrastructure परिनियोजन का समर्थन देने हेतु विस्तारित किया जा रहा है: वर्कस्पेस फ़र्म के अपने क्लाउड खाते में चलता है और LexConnect सुरक्षित ओवरले प्रदान करता है, ताकि डेटा संप्रभुता हमारी होस्टिंग पर बिल्कुल भी निर्भर न रहे।</p>
+
+<h2>8. सुरक्षा संबंधी प्रश्न</h2>
+<p>कोई सुरक्षा-भेद्यता (वल्नेरेबिलिटी) रिपोर्ट करने, हमारा सुरक्षा दस्तावेज़ प्राप्त करने, या इस पृष्ठ के बारे में कोई प्रश्न उठाने हेतु <a href="mailto:contact@parselex.app">contact@parselex.app</a> पर लिखें। हम ज़िम्मेदार प्रकटीकरण (responsible disclosure) रिपोर्टों को प्राथमिकता देते हैं और प्रत्येक रिपोर्ट की पावती देते हैं।</p>
+  </article>
+</main>
+<div class="foot">
+  <nav aria-label="Legal">
+    <a href="/hi/legal/privacy/">गोपनीयता</a>
+    <a href="/hi/legal/personal-data/">व्यक्तिगत डेटा का उपयोग</a>
+    <a href="/hi/legal/cookies/">कुकीज़</a>
+    <a href="/hi/legal/terms/">सेवा की शर्तें</a>
+    <a href="/hi/legal/payments/">आवर्ती भुगतान</a>
+    <a href="/hi/legal/disclaimer/">एआई अस्वीकरण</a>
+    <a href="/hi/security/">सुरक्षा</a>
+    <a href="mailto:contact@parselex.app">सहायता: contact@parselex.app</a>
+  </nav>
+  <p>&copy; 2026 <a href="/hi/" style="color:var(--accent);text-decoration:none;font-weight:600">Parselex</a> &mdash; लीगल डॉक्यूमेंट इंटेलिजेंस प्लेटफ़ॉर्म</p>
+</div>
+<script>
+(function(){
+  var saved=null;
+  try{saved=localStorage.getItem('theme');}catch(e){}
+  if(!saved)saved=(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';
+  document.documentElement.setAttribute('data-theme',saved);
+})();
+</script>
+</body>
+</html>

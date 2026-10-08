@@ -1,0 +1,132 @@
+# =============================================================================
+# Deploy static site to GitHub Pages
+# =============================================================================
+# Builds the MkDocs Material docs site and combines it with the static landing
+# page, architecture assets, and the interactive technical presentation into a
+# single GitHub Pages artifact.
+#
+# This is a PUBLIC repository with no secrets — GitHub-hosted runners are used
+# (the self-hosted-runner-only rule applies to the private legal-doc-tools
+# repo, NOT to this public static site).
+#
+# Trigger: push to main + manual workflow_dispatch
+# Output: https://parselex.github.io/legal-doc-tools-pages/
+# =============================================================================
+
+name: Deploy Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "index.html"
+      - "interactive-technical-layout.html"
+      - "assets/**"
+      - "docs/**"
+      - "benchmark/**"
+      - "auth-gate/**"
+      - "signup/**"
+      - "ru/**"
+      - "es/**"
+      - "fr/**"
+      - "hi/**"
+      - "legal/**"
+      - "security/**"
+      - "mkdocs.yml"
+      - "requirements-docs.txt"
+      - ".github/workflows/deploy.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build static site
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure GitHub Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements-docs.txt
+
+      - name: Install MkDocs Material
+        run: |
+          python -m pip install --upgrade pip
+          pip install \
+            "mkdocs-material>=9.5" \
+            "mkdocs-redirects>=1.2" \
+            "pygments>=2.17" \
+            "pymdown-extensions>=10.7"
+
+      - name: Build MkDocs site
+        # NOTE: --strict is intentionally omitted. docs/index.md legitimately
+        # links to sibling content (../assets/*.png, ../interactive-technical-layout.html)
+        # that lives outside docs_dir but IS deployed at the Pages root at runtime.
+        # With --strict, MkDocs aborts on these expected "broken link" warnings.
+        run: mkdocs build --clean
+
+      - name: Assemble Pages artifact
+        run: |
+          # mkdocs.yml sets site_dir: site/docs, so the docs site is at site/docs/.
+          # We assemble the root-level static content alongside it.
+          set -euo pipefail
+          mkdir -p site
+          cp index.html site/
+          cp interactive-technical-layout.html site/
+          cp -r assets site/
+          # Benchmark dashboard (rendered by private repo's benchmark.yml;
+          # this repo holds a stub until the first run pushes the real one).
+          cp -r benchmark site/
+          # Legacy-path redirect stubs (old apex webui paths -> lexregister)
+          cp -r auth-gate site/
+          cp -r signup site/
+          # Localized landing pages (i18n: ru/es/fr/hi, path-prefixed copies)
+          for loc in ru es fr hi; do
+            [ -d "$loc" ] && cp -r "$loc" site/
+          done
+          # Legal pages (privacy / personal-data / cookies / payments)
+          cp -r legal site/
+          # Security architecture page (s80, EN + locales)
+          cp -r security site/
+          # Landing-level favicon (SVG) at root for /favicon.ico fallback
+          [ -f assets/favicon.svg ] && cp assets/favicon.svg site/favicon.svg || true
+          # Ensure docs subdir exists from mkdocs build
+          test -f site/docs/index.html
+          # Diagnostic: list what we are publishing
+          echo "--- artifact tree ---"
+          find site -maxdepth 2 -type f | sort | head -40
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

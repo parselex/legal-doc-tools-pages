@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parselex — Plataforma de Inteligencia Documental Legal</title>
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<meta name="description" content="Parselex — Plataforma de inteligencia documental legal multidominio impulsada por IA. 7 categorías de inteligencia, 4 regiones, 12+ fuentes de datos. Cobertura penal, civil, mercantil, de comercio electrónico, de regulación financiera, de propiedad intelectual y de litigios. Acceso Zero-Trust mediante el cliente seguro LexConnect.">
+<meta property="og:title" content="Parselex — Plataforma de Inteligencia Documental Legal">
+<meta property="og:description" content="Análisis legal impulsado por IA en 7 categorías de inteligencia y 4 regiones.">
+<meta property="og:url" content="https://docs.parselex.app/es/">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<!--i18n:v1-->
+<link rel="canonical" href="https://docs.parselex.app/es/">
+<link rel="alternate" hreflang="en" href="https://docs.parselex.app/">
+<link rel="alternate" hreflang="ru" href="https://docs.parselex.app/ru/">
+<link rel="alternate" hreflang="es" href="https://docs.parselex.app/es/">
+<link rel="alternate" hreflang="fr" href="https://docs.parselex.app/fr/">
+<link rel="alternate" hreflang="hi" href="https://docs.parselex.app/hi/">
+<link rel="alternate" hreflang="x-default" href="https://docs.parselex.app/">
+
+<style>
+:root, [data-theme="light"] {
+  --primary: #1B2A4A; --primary-light: #2C4270; --primary-dark: #0F1A33; --primary-rgb: 27,42,74;
+  --accent: #C9953C; --accent-light: #D4A843; --accent-rgb: 201,149,60;
+  --success: #1A7F4C; --warning: #D4940A; --danger: #C62828;
+  --bg-body: #F8F9FB; --bg-card: #FFFFFF; --bg-card-hover: #F0F2F5; --bg-input: #EDF0F4; --bg-hero: linear-gradient(135deg, #0F1A33 0%, #1B2A4A 40%, #2C4270 100%);
+  --border: #E2E5EB; --border-card: #E2E5EB;
+  --text-primary: #1A1D23; --text-secondary: #5A6070; --text-muted: #8B919E;
+  --text-on-dark: #FFFFFF; --text-on-dark-muted: #B8C4D8;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.04); --shadow-md: 0 4px 12px rgba(0,0,0,0.06); --shadow-lg: 0 8px 24px rgba(0,0,0,0.08); --shadow: var(--shadow-md);
+  --radius-sm: 6px; --radius-md: 10px; --radius-lg: 14px;
+  --green: #1A7F4C; --red: #C62828; --yellow: #D4940A; --orange: #D47A2E; --blue: #4A7AB5;
+  --nav-bg: #FFFFFF;
+}
+[data-theme="dark"] {
+  --bg-body: #141821; --bg-card: #1C2030; --bg-card-hover: #252A3A; --bg-input: #2A3040;
+  --bg-hero: linear-gradient(135deg, #0A0F1A 0%, #141821 40%, #1C2030 100%);
+  --border: #2A3040; --border-card: #2A3040; --nav-bg: #1C2030;
+  --text-primary: #E8EAF0; --text-secondary: #A0A8B8; --text-muted: #6B7280;
+  --text-on-dark: #F8F9FB; --text-on-dark-muted: #8B919E;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.12); --shadow-md: 0 4px 12px rgba(0,0,0,0.2); --shadow-lg: 0 8px 24px rgba(0,0,0,0.3); --shadow: var(--shadow-md);
+  --green: #2E9B6A; --red: #E04040; --yellow: #E5A820; --orange: #E8923E; --blue: #6AABE0;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{height:100%;scroll-behavior:smooth}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg-body);color:var(--text-primary);line-height:1.6;transition:background .2s,color .2s}
+.top-nav{height:56px;background:var(--nav-bg);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;flex-shrink:0;z-index:100;box-shadow:var(--shadow-sm);position:sticky;top:0;transition:background .2s,border-color .2s}
+.top-nav .nav-logo{display:flex;align-items:center;gap:10px;margin-right:24px;text-decoration:none}
+.top-nav .nav-logo-icon{width:32px;height:32px;background:var(--primary);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:var(--accent);font-weight:800;font-size:16px;flex-shrink:0}
+.top-nav .nav-logo-text{font-size:18px;font-weight:700;color:var(--text-primary);letter-spacing:-0.3px}
+.nav-right{display:flex;align-items:center;gap:12px;margin-left:auto;flex-shrink:0}
+.nav-status{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted)}
+.nav-status-dot{width:7px;height:7px;border-radius:50%;background:var(--green)}
+.nav-status-dot.offline{background:var(--red)}
+.theme-toggle-switch{position:relative;width:40px;height:22px;border-radius:11px;background:var(--bg-input);border:1px solid var(--border);cursor:pointer;padding:0;transition:background .2s}
+.theme-toggle-switch .theme-toggle-track{position:relative;display:block;width:100%;height:100%}
+.theme-toggle-switch .theme-toggle-thumb{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--accent);transition:transform .2s}
+[data-theme="dark"] .theme-toggle-switch .theme-toggle-thumb{transform:translateX(18px)}
+.nav-auth-btn{padding:6px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;transition:all .15s}
+.nav-auth-btn:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+/* login dropdown */
+.login-menu{position:relative;display:inline-flex}
+.login-dropdown{position:absolute;top:calc(100% + 8px);right:0;min-width:260px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--shadow-lg);padding:6px;display:none;z-index:60}
+.login-dropdown.open{display:block;animation:ldIn .12s ease-out}
+@keyframes ldIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.ld-item{display:flex;flex-direction:column;gap:2px;padding:9px 12px;border-radius:var(--radius-sm);text-decoration:none}
+.ld-item:hover{background:var(--bg-input)}
+.ld-item+.ld-item{margin-top:2px}
+.ld-name{font-size:13px;font-weight:700;color:var(--text-primary)}
+.ld-item:hover .ld-name{color:var(--accent)}
+.ld-name::after{content:" \2197";font-size:10px;color:var(--text-muted)}
+.ld-desc{font-size:11px;color:var(--text-muted)}
+.ld-caret{font-size:9px;margin-left:5px;display:inline-block;transform:translateY(-1px)}
+.hero{background:var(--bg-hero);padding:80px 24px 60px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at 30% 20%,rgba(201,149,60,0.08) 0%,transparent 60%),radial-gradient(ellipse at 70% 80%,rgba(74,122,181,0.06) 0%,transparent 60%);pointer-events:none}
+.hero-content{max-width:800px;margin:0 auto;position:relative;z-index:1}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 16px;border-radius:20px;background:rgba(201,149,60,0.15);border:1px solid rgba(201,149,60,0.3);color:var(--accent);font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-bottom:24px}
+.hero h1{font-size:48px;font-weight:800;color:var(--text-on-dark);letter-spacing:-1px;line-height:1.1;margin-bottom:16px}
+.hero h1 span{color:var(--accent)}
+.hero p{font-size:18px;color:var(--text-on-dark-muted);max-width:600px;margin:0 auto 32px;line-height:1.7}
+.hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.hero-actions .btn{padding:14px 28px;font-size:14px;font-weight:700;border-radius:var(--radius-sm);border:none;cursor:pointer;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;font-family:inherit}
+.hero-actions .btn-primary{background:var(--accent);color:#fff}
+.hero-actions .btn-primary:hover{background:var(--accent-light);transform:translateY(-2px);box-shadow:0 6px 20px rgba(201,149,60,0.3)}
+.hero-actions .btn-secondary{background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2)}
+.hero-actions .btn-secondary:hover{background:rgba(255,255,255,0.15);transform:translateY(-2px)}
+.section{padding:60px 24px;max-width:1200px;margin:0 auto}
+.section-title{font-size:32px;font-weight:800;letter-spacing:-0.5px;margin-bottom:8px;color:var(--text-primary)}
+.section-subtitle{font-size:16px;color:var(--text-secondary);margin-bottom:36px;max-width:750px;line-height:1.6}
+.section-accent-line{width:40px;height:3px;background:var(--accent);border-radius:2px;margin-bottom:16px}
+/* ── Intelligence Category Table Rows ── */
+.intel-row{background:var(--bg-card);border:1px solid var(--border-card);border-radius:var(--radius-lg);padding:32px 36px;box-shadow:var(--shadow-md);transition:all .25s;position:relative;overflow:hidden;display:flex;gap:28px;align-items:flex-start}
+.intel-row:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.intel-row+.intel-row{margin-top:16px}
+.intel-num{flex-shrink:0;width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;color:#fff;position:relative}
+.intel-body{flex:1;min-width:0}
+.intel-body h3{font-size:22px;font-weight:800;margin-bottom:4px;color:var(--text-primary);letter-spacing:-0.3px}
+.intel-body .intel-sub{font-size:14px;color:var(--text-muted);margin-bottom:12px}
+.intel-body .intel-desc{font-size:15px;color:var(--text-secondary);line-height:1.7;margin-bottom:14px}
+.intel-chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.intel-chip{padding:5px 12px;border-radius:6px;background:var(--bg-input);font-size:12px;font-weight:600;color:var(--text-secondary);border:1px solid var(--border);transition:all .15s}
+.intel-chip:hover{border-color:var(--accent);color:var(--accent)}
+.intel-modules{font-size:13px;color:var(--text-muted);font-style:italic}
+.intel-docs{font-size:12px;color:var(--text-muted);margin-top:5px}
+.intel-badge{display:inline-block;padding:5px 14px;border-radius:5px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-top:12px}
+/* ── Corpus Architecture Diagram ── */
+.diagram-section{background:var(--bg-card);border:1px solid var(--border-card);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-lg);transition:box-shadow .3s}
+.diagram-section:hover{box-shadow:0 12px 32px rgba(0,0,0,0.12)}
+.diagram-section img{width:100%;height:auto;display:block;cursor:zoom-in}
+.diagram-caption{padding:24px 32px;border-top:1px solid var(--border);font-size:14px;color:var(--text-secondary);line-height:1.7}
+.diagram-caption strong{color:var(--text-primary)}
+.diagram-hint{font-size:11px;color:var(--text-muted);margin-top:8px;text-align:right;font-style:italic}
+/* ── Architecture Diagrams ── */
+.arch-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.roadmap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.roadmap-item{background:var(--bg-card);border:1px solid var(--border-card);border-radius:var(--radius-md);padding:20px;border-left:3px solid var(--accent)}
+.roadmap-item.phase-2{border-left-color:var(--primary)}
+.roadmap-item.phase-3{border-left-color:var(--success)}
+.roadmap-item h4{font-size:15px;font-weight:700;margin-bottom:8px;color:var(--text-primary)}
+.roadmap-item p{font-size:13px;color:var(--text-secondary);line-height:1.6}
+.roadmap-phase{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;padding:2px 8px;border-radius:4px;margin-bottom:8px;display:inline-block}
+.roadmap-phase.p1{background:rgba(201,149,60,0.1);color:var(--accent)}
+.roadmap-phase.p2{background:rgba(201,149,60,0.12);color:var(--accent)}
+.roadmap-phase.p3{background:rgba(26,127,76,0.12);color:var(--success)}
+.cta-section{background:var(--bg-hero);padding:48px 24px;text-align:center;border-radius:var(--radius-lg);margin:0 auto;max-width:1200px;position:relative}
+.cta-section h2{font-size:22px;font-weight:800;color:var(--text-on-dark);margin-bottom:8px}
+.cta-section p{font-size:13px;color:var(--text-on-dark-muted);margin-bottom:20px;max-width:480px;margin-left:auto;margin-right:auto}
+.footer{padding:32px 24px;text-align:center;border-top:1px solid var(--border);margin-top:40px}
+.footer p{font-size:12px;color:var(--text-muted)}
+.footer a{color:var(--accent);text-decoration:none;font-weight:600}
+.footer-legal{display:flex;gap:8px 22px;justify-content:center;flex-wrap:wrap;font-size:12px;margin-bottom:14px}
+.footer-legal a{color:var(--text-secondary);text-decoration:none;font-weight:500;border-bottom:1px dotted var(--border);padding-bottom:1px}
+.footer-legal a:hover{color:var(--accent);border-bottom-color:var(--accent)}
+.footer-legal .fl-s{font-weight:700;color:var(--text-primary)}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.animate-in{animation:fadeInUp .6s ease both}
+.animate-in:nth-child(2){animation-delay:.08s}
+.animate-in:nth-child(3){animation-delay:.16s}
+.animate-in:nth-child(4){animation-delay:.24s}
+.animate-in:nth-child(5){animation-delay:.32s}
+.animate-in:nth-child(6){animation-delay:.4s}
+.animate-in:nth-child(7){animation-delay:.48s}
+@media(max-width:900px){.arch-grid,.roadmap-grid{grid-template-columns:1fr 1fr}.hero h1{font-size:36px}.intel-row{flex-direction:column;gap:12px}.section-title{font-size:26px}.intel-body h3{font-size:18px}}
+@media(max-width:600px){.arch-grid,.roadmap-grid{grid-template-columns:1fr}.intel-row{padding:20px 16px}.hero h1{font-size:28px}}
+
+/* i18n language switcher */
+.lang-switch{position:relative;display:inline-flex;align-items:center}
+.lang-switch select{background:var(--bg-input);color:var(--text-primary);border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;font-weight:600;padding:6px 24px 6px 10px;cursor:pointer;appearance:none;-webkit-appearance:none;font-family:inherit}
+.lang-switch select:hover{border-color:var(--accent)}
+.visually-hidden{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <a href="/" class="nav-logo"><div class="nav-logo-icon">P</div><span class="nav-logo-text">Parselex</span></a>
+  <div class="nav-right">
+    <div class="lang-switch"><label class="visually-hidden" for="langSelect">Idioma</label><select id="langSelect" aria-label="Idioma"><option value="/">English</option><option value="/ru/">Русский</option><option value="/es/" selected>Español</option><option value="/fr/">Français</option><option value="/hi/">हिन्दी</option></select></div>
+    <span class="nav-status"><span class="nav-status-dot"></span><span class="nav-status-text" id="navStatusText">En línea</span></span>
+    <button class="theme-toggle-switch" id="themeToggle" title="Cambiar tema"><span class="theme-toggle-track"><span class="theme-toggle-thumb"></span></span></button>
+    <div class="login-menu"><button class="nav-auth-btn" id="authBtn" aria-haspopup="true" aria-expanded="false" aria-controls="loginMenu">Iniciar sesión<span class="ld-caret">&#9662;</span></button><nav class="login-dropdown" id="loginMenu" aria-label="Iniciar sesión en las aplicaciones Parselex"><a class="ld-item" href="https://dashboard.parselex.app"><span class="ld-name">Panel de la aplicación</span><span class="ld-desc">Espacio de trabajo principal</span></a><a class="ld-item" href="https://lexregister.parselex.app"><span class="ld-name">LexRegister</span><span class="ld-desc">Crear una cuenta</span></a><a class="ld-item" href="https://mcp-dashboard.parselex.app"><span class="ld-name">MCP-HUB</span><span class="ld-desc">Estado de servicios y monitoreo</span></a></nav></div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-badge">&#9878; 7 categorías de inteligencia &#8212; 4 regiones &#8212; más de 12 fuentes de datos</div>
+    <h1>Plataforma de <span>Inteligencia</span><br>Documental Legal</h1>
+    <p>Análisis legal multidominio impulsado por IA. Ingeste desde cualquier fuente &#8212; Telegram, correo electrónico, GDrive, teléfono, WhatsApp &#8212; y procéselo a través de 7 categorías de inteligencia especializadas. El acceso se realiza a través de <strong>LexConnect</strong>, nuestro cliente seguro Zero-Trust &#8212; los datos privilegiados de los casos nunca tocan el internet público.</p>
+    <div class="hero-actions">
+      <a href="https://lexregister.parselex.app/" class="btn btn-primary">Registro gratuito &#8594;</a>
+      <a href="#corpus" class="btn btn-secondary">Ver arquitectura del corpus</a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Corpus Architecture Diagram (LEFT sources → RIGHT table) ═══ -->
+<section class="section" id="corpus">
+  <div class="section-accent-line"></div>
+  <h2 class="section-title">Arquitectura del corpus de documentos del cliente</h2>
+  <p class="section-subtitle">Más de 12 fuentes de datos alimentan el pipeline de procesamiento, que dirige la inteligencia a 7 categorías especializadas. Todos los datos fluyen a través de una base de conocimiento RAG unificada con más de 792 fragmentos indexados.</p>
+  <div class="diagram-section" onclick="if(event.target.tagName==='IMG'){window.open(event.target.src,'_blank')}">
+    <img src="../assets/corpus-flowchart.png" alt="Arquitectura del corpus de inteligencia legal" loading="lazy">
+    <div class="diagram-caption" style="text-align:left;line-height:1.8">
+      <strong>Arquitectura del corpus</strong><br><br>
+      <strong>IZQUIERDA:</strong> 12 fuentes de datos (Telegram, WhatsApp, correo electrónico, GDrive, teléfono, archivos de chat, escáner OCR, carga de archivos, API/Webhook, feeds judiciales, SFTP, CRM).<br>
+      <strong>CENTRO:</strong> Pipeline de procesamiento de 7 etapas (Ingesta &#8594; OCR &#8594; Clasificación &#8594; Validación &#8594; Análisis RAG &#8594; Traducción IA &#8594; Generación de informes) con base de conocimiento RAG en ChromaDB (más de 792 fragmentos indexados).<br>
+      <strong>DERECHA:</strong> 7 categorías de inteligencia en tabla vertical &#8212; derecho penal, derecho civil, COMM (comercial internacional), ECOM (comercio electrónico), FINREG (regulación financiera), IP (propiedad intelectual) y apoyo a litigios. Cada categoría procesa documentos de todas las fuentes mediante módulos de IA conscientes de la jurisdicción.<br><br>
+      <span style="letter-spacing:2px;font-weight:700;color:var(--accent)">Penal</span> &nbsp; <span style="letter-spacing:2px;font-weight:700;color:var(--blue)">Civil</span> &nbsp; <span style="letter-spacing:2px;font-weight:700;color:var(--orange)">Comm</span> &nbsp; <span style="letter-spacing:2px;font-weight:700;color:#2A8C8C">ECOM</span> &nbsp; <span style="letter-spacing:2px;font-weight:700;color:var(--warning)">FINREG</span> &nbsp; <span style="letter-spacing:2px;font-weight:700;color:#7B61C7">IP</span> &nbsp; <span style="letter-spacing:2px;font-weight:700;color:var(--success)">Litigios</span>
+      <div class="diagram-hint" style="margin-top:8px">Haga clic en la imagen para verla en resolución completa</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ 7 Intelligence Categories — Vertical Table ═══ -->
+<section class="section" id="categories" style="background:var(--bg-card);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div style="max-width:1000px;margin:0 auto">
+    <div class="section-accent-line"></div>
+    <h2 class="section-title">7 categorías de inteligencia</h2>
+    <p class="section-subtitle">Cada categoría procesa documentos de las más de 12 fuentes de datos mediante sus propios módulos de IA conscientes de la jurisdicción.</p>
+
+    <!-- 1. Criminal Law -->
+    <div class="intel-row animate-in" style="border-left:5px solid var(--red)">
+      <div class="intel-num" style="background:var(--red)">1</div>
+      <div class="intel-body">
+        <h3 style="color:var(--red)">Inteligencia de Derecho Penal</h3>
+        <div class="intel-sub">4 regiones &#8212; América / EE. UU., Europa, Asia, India</div>
+        <p class="intel-desc">Inteligencia integral de casos penales &#8212; redacción de FIR, mapeo de cargos, validación de evidencia forense, verificación cruzada y puntuación de preparación del caso. Apoya el enjuiciamiento multi-jurisdiccional con marcos de cooperación INTERPOL/Europol.</p>
+        <div class="intel-chips">
+          <span class="intel-chip">América / EE. UU.</span><span class="intel-chip">Europe</span><span class="intel-chip">Asia</span><span class="intel-chip">India</span>
+        </div>
+        <div class="intel-modules">Redacción de FIR | Mapeo de cargos | Validación de evidencia | Forense | Puntuación de casos</div>
+        <div class="intel-docs">FIR, actos de acusación, declaraciones de testigos, informes forenses, apelaciones</div>
+        <span class="intel-badge" style="background:rgba(198,40,40,0.1);color:var(--red)">PENAL</span>
+      </div>
+    </div>
+
+    <!-- 2. Civil Law -->
+    <div class="intel-row animate-in" style="border-left:5px solid var(--blue)">
+      <div class="intel-num" style="background:var(--blue)">2</div>
+      <div class="intel-body">
+        <h3 style="color:var(--blue)">Inteligencia de Derecho Civil</h3>
+        <div class="intel-sub">4 regiones &#8212; América / EE. UU., Europa, Asia, India</div>
+        <p class="intel-desc">Resolución integral de disputas civiles con extracción de cláusulas contractuales impulsada por IA, mapeo de obligaciones, identificación de riesgos y verificación de cumplimiento. Plantillas conscientes de la jurisdicción para disputas de propiedad, reclamaciones por agravios y procesos de derecho de familia.</p>
+        <div class="intel-chips">
+          <span class="intel-chip">América / EE. UU.</span><span class="intel-chip">Europe</span><span class="intel-chip">Asia</span><span class="intel-chip">India</span>
+        </div>
+        <div class="intel-modules">Análisis de contratos | Resolución de disputas | Derecho de propiedad | Derecho de familia</div>
+        <div class="intel-docs">Contratos, escritos de alegatos, órdenes judiciales, acuerdos de conciliación, títulos</div>
+        <span class="intel-badge" style="background:rgba(74,122,181,0.1);color:var(--blue)">CIVIL</span>
+      </div>
+    </div>
+
+    <!-- 3. COMM -->
+    <div class="intel-row animate-in" style="border-left:5px solid var(--orange)">
+      <div class="intel-num" style="background:var(--orange)">3</div>
+      <div class="intel-body">
+        <h3 style="color:var(--orange)">COMM &#8212; Derecho Comercial Internacional</h3>
+        <div class="intel-sub">CISG | UNIDROIT | Incoterms 2020 | UCC Art.2 | UCP 600 | ISDA</div>
+        <p class="intel-desc">Inteligencia de derecho comercial internacional de espectro completo &#8212; cumplimiento de contratos de comercio, verificación de cartas de crédito, apoyo al arbitraje internacional, análisis de transacciones transfronterizas e interpretación de la convención de ventas de la ONU.</p>
+        <div class="intel-chips">
+          <span class="intel-chip">CISG</span><span class="intel-chip">Principios UNIDROIT</span><span class="intel-chip">Incoterms 2020</span><span class="intel-chip">UCC Article 2</span><span class="intel-chip">UCP 600</span><span class="intel-chip">ISDA Master</span><span class="intel-chip">Convención de NY</span>
+        </div>
+        <div class="intel-modules">Revisión de contratos | Cumplimiento comercial | Apoyo al arbitraje | Debida diligencia</div>
+        <div class="intel-docs">Contratos de comercio, solicitudes de LC, memoriales de arbitraje, conocimientos de embarque</div>
+        <span class="intel-badge" style="background:rgba(212,122,46,0.1);color:var(--orange)">COMM</span>
+      </div>
+    </div>
+
+    <!-- 4. ECOM -->
+    <div class="intel-row animate-in" style="border-left:5px solid #2A8C8C">
+      <div class="intel-num" style="background:#2A8C8C">4</div>
+      <div class="intel-body">
+        <h3 style="color:#2A8C8C">ECOM &#8212; Comercio Electrónico y Protección al Consumidor</h3>
+        <div class="intel-sub">EU DSA | Consumer Rights Dir | FTC Act | CCPA | PCI DSS | PSD2</div>
+        <p class="intel-desc">Cumplimiento regulatorio del comercio electrónico que abarca obligaciones del acta de servicios digitales, directivas de protección al consumidor, estándares de seguridad de tarjetas de pago y servicios de pago electrónico. Revisión de términos con IA, auditoría de privacidad y análisis de quejas de consumidores.</p>
+        <div class="intel-chips">
+          <span class="intel-chip">Acta de Servicios Digitales de la UE</span><span class="intel-chip">Dir. de Derechos del Consumidor</span><span class="intel-chip">FTC Act</span><span class="intel-chip">CCPA/CPRA</span><span class="intel-chip">PCI DSS</span><span class="intel-chip">PSD2</span><span class="intel-chip">Dir. de Comercio Electrónico</span>
+        </div>
+        <div class="intel-modules">Auditoría de cumplimiento | Revisión de términos | Evaluación de privacidad | Reclamaciones de consumidores</div>
+        <div class="intel-docs">Términos de servicio, políticas de privacidad, quejas de consumidores, registros de pagos</div>
+        <span class="intel-badge" style="background:rgba(42,140,140,0.1);color:#2A8C8C">ECOM</span>
+      </div>
+    </div>
+
+    <!-- 5. FINREG -->
+    <div class="intel-row animate-in" style="border-left:5px solid var(--yellow)">
+      <div class="intel-num" style="background:var(--yellow)">5</div>
+      <div class="intel-body">
+        <h3 style="color:var(--yellow)">FINREG &#8212; Regulación Financiera y AML</h3>
+        <div class="intel-sub">MiFID II | MAR | BSA/AML | FATF | SOX | Basel III | MiCA</div>
+        <p class="intel-desc">Inteligencia de regulación financiera de nivel empresarial &#8212; filtrado AML, monitoreo de transacciones, reporte de actividades sospechosas, detección de abuso de mercado y cumplimiento prudencial. Cubre el secreto bancario, la regulación de valores y los marcos de criptoactivos.</p>
+        <div class="intel-chips">
+          <span class="intel-chip">MiFID II</span><span class="intel-chip">MAR</span><span class="intel-chip">BSA/AML</span><span class="intel-chip">FATF</span><span class="intel-chip">SOX</span><span class="intel-chip">Basilea III</span><span class="intel-chip">MiCA</span>
+        </div>
+        <div class="intel-modules">Filtrado AML | Monitoreo de transacciones | Presentación de SAR | Cumplimiento cripto</div>
+        <div class="intel-docs">SAR, CTR, documentos KYC, registros de transacciones, informes de auditoría</div>
+        <span class="intel-badge" style="background:rgba(212,148,10,0.1);color:var(--yellow)">FINREG</span>
+      </div>
+    </div>
+
+    <!-- 6. IP -->
+    <div class="intel-row animate-in" style="border-left:5px solid #7B61C7">
+      <div class="intel-num" style="background:#7B61C7">6</div>
+      <div class="intel-body">
+        <h3 style="color:#7B61C7">IP &#8212; Propiedad Intelectual y Protección de Datos</h3>
+        <div class="intel-sub">TRIPS | Berne | DMCA | GDPR | EU AI Act | NIST CSF | ISO 27001</div>
+        <p class="intel-desc">Inteligencia completa de PI y protección de datos &#8212; análisis de patentes, reclamaciones de derechos de autor, disputas de marcas, obligaciones de mapeo de datos, cumplimiento regulatorio de IA y marcos de ciberseguridad. Gestión de portafolio de PI multi-jurisdiccional con detección automatizada de infracciones.</p>
+        <div class="intel-chips">
+          <span class="intel-chip">TRIPS</span><span class="intel-chip">Convenio de Berna</span><span class="intel-chip">DMCA</span><span class="intel-chip">GDPR</span><span class="intel-chip">Acta de IA de la UE</span><span class="intel-chip">NIST CSF</span><span class="intel-chip">ISO 27001</span>
+        </div>
+        <div class="intel-modules">Análisis de patentes | Reclamaciones de derechos de autor | Mapeo de datos | Cumplimiento de IA</div>
+        <div class="intel-docs">Solicitudes de patente, registros de derechos de autor, DPIA, licencias de PI</div>
+        <span class="intel-badge" style="background:rgba(123,97,199,0.1);color:#7B61C7">IP</span>
+      </div>
+    </div>
+
+    <!-- 7. Litigation -->
+    <div class="intel-row animate-in" style="border-left:5px solid var(--green)">
+      <div class="intel-num" style="background:var(--green)">7</div>
+      <div class="intel-body">
+        <h3 style="color:var(--green)">Apoyo a Litigios y Analítica</h3>
+        <div class="intel-sub">Inteligencia entre módulos &#8212; estrategia, discovery, minería de precedentes</div>
+        <p class="intel-desc">Inteligencia de litigios entre módulos que integra los 6 dominios. Formulación de estrategia de casos con IA, revisión de documentos de discovery, minería de precedentes legales entre más de 792 fragmentos indexados, puntuación de riesgos, optimización de conciliaciones y gestión de presentaciones judiciales.</p>
+        <div class="intel-chips">
+          <span class="intel-chip">Gestión de casos</span><span class="intel-chip">Revisión de discovery</span><span class="intel-chip">Búsqueda de precedentes</span><span class="intel-chip">Evaluación de riesgos</span><span class="intel-chip">Análisis de conciliación</span><span class="intel-chip">Presentación judicial</span><span class="intel-chip">Apelaciones</span>
+        </div>
+        <div class="intel-modules">Estrategia de casos | Revisión de discovery | Minería de precedentes | Puntuación de riesgos</div>
+        <div class="intel-docs">Expedientes, documentos de discovery, bases de precedentes, presentaciones judiciales</div>
+        <span class="intel-badge" style="background:rgba(26,127,76,0.1);color:var(--green)">LITIGATION</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Security by Architecture (LexConnect + Cortafuegos ético) ═══ -->
+<section class="section" id="security" style="background:var(--bg-card);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div style="max-width:1200px;margin:0 auto">
+    <div class="section-accent-line"></div>
+    <h2 class="section-title">Seguridad por arquitectura, no por promesa</h2>
+    <p class="section-subtitle">Parselex funciona sobre una red mesh Zero-Trust diseñada para los requisitos éticos y de cumplimiento normativo del ejercicio de la abogacía. El acceso se gestiona a través de <strong>LexConnect</strong> &#8212; nuestro cliente de red seguro &#8212; y los documentos quedan protegidos por la anonimización de datos personales en el dispositivo (edge).</p>
+    <div class="roadmap-grid">
+      <div class="roadmap-item"><span class="roadmap-phase p1">LexConnect &#8212; Acceso de red Zero-Trust</span><h4>Cero puntos finales públicos. Cero superficie de ataque.</h4><p>Los espacios de trabajo no existen en el internet público. El cliente LexConnect establece un túnel mesh cifrado con verificación del estado del dispositivo y acceso bajo el principio de mínimo privilegio &#8212; los nodos de inferencia carecen de direcciones IP públicas.</p></div>
+      <div class="roadmap-item phase-2"><span class="roadmap-phase p2">El cortafuegos ético</span><h4>Anonimización de datos personales en el dispositivo (edge)</h4><p>Los nombres, los identificadores y los números de cuenta se reemplazan por tokens deterministas en su dispositivo antes de la transmisión. Nuestros motores procesan la lógica jurídica, no las identidades personales &#8212; la reidentificación se realiza localmente en el retorno.</p></div>
+      <div class="roadmap-item phase-3"><span class="roadmap-phase p3">Soberanía de los datos</span><h4>Procesamiento efímero. Sin registro de contenido.</h4><p>Sus expedientes nunca entrenan modelos públicos. La inferencia se ejecuta en sesiones efímeras y el acceso se audita &#8212; quién se conectó y cuándo &#8212; mientras que la carga útil nunca se registra.</p></div>
+    </div>
+    <p style="text-align:center;margin-top:24px"><a href="/security/" class="btn btn-secondary">Lea la arquitectura de seguridad completa &#8594;</a></p>
+  </div>
+</section>
+
+<!-- ═══ System Architecture ═══ -->
+<section class="section" id="architecture">
+  <div class="section-accent-line"></div>
+  <h2 class="section-title">Arquitectura del sistema</h2>
+  <p class="section-subtitle">Cómo Parselex procesa, valida y genera inteligencia legal a partir de sus documentos.</p>
+  <div class="arch-grid">
+    <div class="diagram-section" onclick="if(event.target.tagName==='IMG'){window.open(event.target.src,'_blank')}"><img src="../assets/architecture.png" alt="Arquitectura del sistema" loading="lazy"><div class="diagram-caption"><strong>Arquitectura integrada</strong> &#8212; sistema de 5 capas: WebUI, backend FastAPI, pipeline de documentos, RAG/LLM, infraestructura en la nube.</div></div>
+    <div class="diagram-section" onclick="if(event.target.tagName==='IMG'){window.open(event.target.src,'_blank')}"><img src="../assets/pipeline-flow.png" alt="Pipeline de procesamiento" loading="lazy"><div class="diagram-caption"><strong>Pipeline de procesamiento</strong> &#8212; Carga &#8594; OCR &#8594; Clasificación &#8594; Validación &#8594; RAG &#8594; Informe &#8594; Traducción.</div></div>
+  </div>
+  <div style="max-width:1200px;margin:36px auto 0">
+    <h3 style="font-size:18px;font-weight:800;margin-bottom:16px;color:var(--text-primary)">Pila tecnológica</h3>
+    <div class="roadmap-grid">
+      <div class="roadmap-item"><span class="roadmap-phase p1">IA y RAG</span><h4>Motor de inteligencia</h4><p>Pipeline de FastAPI &#183; base de conocimiento vectorial ChromaDB &#183; enrutamiento de modelos Gemini / Groq / Ollama &#183; OCR de GCP Vision &#183; embeddings del dominio jurídico &#183; servicios dockerizados.</p></div>
+      <div class="roadmap-item phase-2"><span class="roadmap-phase p2">Seguridad y red</span><h4>LexConnect</h4><p>Cliente mesh Zero-Trust &#183; túneles cifrados del dispositivo a la nube &#183; SSO / MFA y comprobaciones del estado del dispositivo &#183; filtrado DLP a nivel de DNS &#183; acceso de mínimo privilegio &#183; edge de Cloudflare.</p></div>
+      <div class="roadmap-item phase-3"><span class="roadmap-phase p3">Privacidad y cumplimiento normativo</span><h4>Cortafuegos ético</h4><p>Anonimización de datos personales en el dispositivo (edge) &#183; sesiones de inferencia efímeras &#183; auditoría de acceso sin registro de contenido &#183; aislamiento de datos por cuenta &#183; suite de evaluación con pytest + RAGAS.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ Milestones ═══ -->
+<section class="section" id="roadmap" style="background:var(--bg-card);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+  <div style="max-width:1200px;margin:0 auto">
+    <div class="section-accent-line"></div>
+    <h2 class="section-title">Hitos de la plataforma</h2>
+    <div class="roadmap-grid">
+      <div class="roadmap-item"><span class="roadmap-phase p1">Fase 1</span><h4>Plataforma central</h4><p>39 módulos de IA, 12 páginas WebUI, autenticación multiusuario, aislamiento de datos, ChromaDB RAG, Groq LLM, GCP Vision OCR.</p></div>
+      <div class="roadmap-item phase-2"><span class="roadmap-phase p2">Fase 2</span><h4>7 Dominios de Inteligencia</h4><p>Apoyo en derecho penal, civil, comercial, comercio electrónico, regulación financiera, PI y litigios.</p></div>
+      <div class="roadmap-item phase-3"><span class="roadmap-phase p3">Fase 3</span><h4>Empresarial</h4><p>Portal de cliente, informes con marca propia, marketplace de API, SSO/SAML, analítica de facturación, acceso Zero-Trust al espacio de trabajo mediante LexConnect.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CTA ═══ -->
+<section class="section">
+  <div class="cta-section">
+    <h2>Comience con Parselex</h2>
+    <p>Cree una cuenta gratuita para acceder a la inteligencia documental legal impulsada por IA en 7 dominios y más de 12 fuentes de datos.</p>
+    <a href="https://lexregister.parselex.app/" class="btn btn-primary" style="display:inline-flex;padding:10px 24px;font-size:13px">Registro gratuito &#8594;</a>
+  </div>
+</section>
+
+<footer class="footer">
+  <nav class="footer-legal" aria-label="Legal">
+    <a href="/es/legal/privacy">Privacidad</a>
+    <a href="/es/legal/personal-data">Uso de datos personales</a>
+    <a href="/es/legal/cookies">Cookies</a>
+    <a href="/es/legal/terms">Términos del servicio</a>
+    <a href="/es/legal/payments">Pagos recurrentes</a>
+    <a href="/es/legal/disclaimer">Descargo de responsabilidad de IA</a>
+    <a href="/es/security/">Seguridad</a>
+    <a href="mailto:contact@parselex.app"><span class="fl-s">Soporte:</span> contact@parselex.app</a>
+  </nav>
+  <p>&copy; 2026 <a href="/">Parselex</a> &#8212; Plataforma de Inteligencia Documental Legal</p>
+</footer>
+
+<script>
+(function(){
+  var saved=localStorage.getItem('theme');
+  if(saved)document.documentElement.setAttribute('data-theme',saved);
+  var btn=document.getElementById('themeToggle');
+  btn.onclick=function(){var c=document.documentElement.getAttribute('data-theme'),n=c==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',n);localStorage.setItem('theme',n);};
+})();
+(function(){
+  var b=document.getElementById('authBtn'),m=document.getElementById('loginMenu');
+  if(!b||!m)return;
+  function set(o){m.classList[o?'add':'remove']('open');b.setAttribute('aria-expanded',o?'true':'false');}
+  b.addEventListener('click',function(e){e.stopPropagation();set(!m.classList.contains('open'));});
+  document.addEventListener('click',function(e){if(!m.contains(e.target)&&!b.contains(e.target))set(false);});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')set(false);});
+  m.addEventListener('click',function(e){if(e.target.closest('a'))set(false);});
+})();
+(function(){
+  var dot=document.querySelector('.nav-status-dot');
+  var text=document.getElementById('navStatusText');
+  if(text){text.textContent='Producción';}
+  if(dot){dot.classList.remove('offline');}
+  // Optional live probe of the production app (CORS-permissive /health endpoint).
+  function checkHealth(){
+    fetch('https://parselex.app/health',{mode:'no-cors'}).then(function(){if(dot)dot.classList.remove('offline');if(text)text.textContent='En línea';})
+    .catch(function(){if(dot)dot.classList.add('offline');if(text)text.textContent='Sin conexión';});
+  }
+  checkHealth();setInterval(checkHealth,30000);
+})();
+</script>
+
+<script>
+(function(){
+  var sel=document.getElementById('langSelect');
+  if(sel){sel.addEventListener('change',function(){
+    var v=sel.value;
+    if(!v)return;
+    try{localStorage.setItem('plexLocalePref',v==='/'?'en':v.replace(/\//g,''));}catch(e){}
+    window.location.href=v;
+  });}
+})();
+</script>
+</body>
+</html>
