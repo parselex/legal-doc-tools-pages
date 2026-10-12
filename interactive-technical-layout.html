@@ -1,0 +1,506 @@
+505 docs/interactive-technical-layout.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>parselex/legal-doc-tools — interactive technical architecture layout (v3)</title>
+<style>
+:root{
+  --bg:#07111f;--panel:#0f1b30;--panel2:#13223d;--panel3:#1a2d4e;--border:#27446f;--text:#eef4ff;--muted:#b8c7e6;
+  --cyan:#72ddf7;--green:#9be37c;--gold:#ffd166;--pink:#ff8fca;--orange:#ffb86b;--red:#ff7b7b;--violet:#b49cff;
+  --shadow:0 18px 50px rgba(0,0,0,.28);
+}
+*{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:radial-gradient(circle at top,#132548,#07111f 45%);color:var(--text);font:16px/1.5 Inter,Segoe UI,Arial,sans-serif}
+a{color:var(--cyan)}
+header{padding:28px 28px 16px;border-bottom:1px solid rgba(120,160,220,.18);background:linear-gradient(180deg,rgba(17,31,57,.92),rgba(7,17,31,.75));backdrop-filter:blur(12px);position:sticky;top:0;z-index:50}
+h1{margin:0;font-size:38px;line-height:1.15} h2{font-size:26px;margin:0 0 12px} h3{font-size:20px;margin:0 0 10px}
+p{margin:0 0 12px;color:var(--muted)}
+main{max-width:1920px;margin:0 auto;padding:18px}
+.card{background:linear-gradient(180deg,rgba(18,31,54,.96),rgba(13,24,44,.96));border:1px solid rgba(90,130,190,.32);border-radius:20px;box-shadow:var(--shadow);padding:18px;margin:14px 0}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+button.filter{appearance:none;border:1px solid var(--border);background:#132443;color:var(--text);padding:10px 14px;border-radius:999px;cursor:pointer;font-weight:700;transition:.18s transform,.18s background,.18s border-color}
+button.filter:hover,button.filter.active{background:#1f3763;border-color:#5c84c4;transform:translateY(-1px)}
+.legend{display:flex;flex-wrap:wrap;gap:8px}.legend span{font-size:13px;border:1px solid var(--border);background:#11213f;padding:6px 10px;border-radius:999px;color:#d7e6ff}
+.grid{display:grid;grid-template-columns:1.25fr .95fr;gap:16px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}.grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.zone{border:1px solid rgba(102,141,199,.28);background:rgba(19,34,61,.78);border-radius:18px;padding:14px}
+.zone h3{display:flex;align-items:center;justify-content:space-between}.tag{font-size:12px;padding:4px 8px;border-radius:999px;background:#203864;color:#eef4ff;border:1px solid #5178b9}
+details{border:1px solid rgba(85,121,176,.25);border-radius:14px;background:rgba(10,19,35,.35);padding:10px 12px} details+details{margin-top:10px} summary{cursor:pointer;font-weight:700;color:#edf4ff}
+.kpi{background:linear-gradient(180deg,#132545,#102039);border:1px solid #2b4976;border-radius:18px;padding:14px}.kpi .v{font-size:34px;font-weight:800;margin-top:2px}.kpi .l{font-size:13px;color:#a8bbde;text-transform:uppercase;letter-spacing:.08em}
+.chart{background:#0e1a31;border:1px solid #27446f;border-radius:18px;padding:12px;min-height:320px;position:relative;overflow:hidden}
+svg{width:100%;height:auto;display:block}.muted{color:var(--muted)}.tiny{font-size:12px;color:#9eb2d7}.small{font-size:14px}
+.callout{border-left:4px solid var(--cyan);padding-left:12px}
+.callout-warn{border-left:4px solid var(--gold);padding-left:12px}
+.callout-err{border-left:4px solid var(--red);padding-left:12px}
+.hidden{display:none!important}.pillline{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}.pillline span{font-size:12px;padding:6px 10px;border-radius:999px;background:#132443;border:1px solid #35598f}
+table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14px}
+th,td{padding:8px 12px;border:1px solid rgba(90,130,190,.25);text-align:left}
+th{background:#132443;font-weight:700;color:#eef4ff}
+td{background:rgba(15,27,48,.6);color:#b8c7e6}
+td code{background:#1a2d4e;padding:2px 6px;border-radius:4px;font-size:13px;color:#72ddf7}
+.route-table td:first-child{font-weight:700;color:#eef4ff;white-space:nowrap}
+@media (max-width:1280px){.grid,.grid3,.grid4,.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>parselex/legal-doc-tools &mdash; interactive technical architecture layout</h1>
+  <p class="small">Updated for <code>v0.2.0</code> release (2026-06-14). Click a filter to isolate zones. All inventory numbers verified against the GitHub tree and VPS runtime.</p>
+  <div class="toolbar" id="filters">
+    <button class="filter active" data-filter="all">All</button>
+    <button class="filter" data-filter="monorepo">Monorepo</button>
+    <button class="filter" data-filter="pipeline">Document pipeline</button>
+    <button class="filter" data-filter="rag">RAG / LLM routing</button>
+    <button class="filter" data-filter="ui">UI surface</button>
+    <button class="filter" data-filter="eval">Eval / Benchmark</button>
+    <button class="filter" data-filter="runner">Runner lifecycle</button>
+    <button class="filter" data-filter="vm">VM provisioning</button>
+    <button class="filter" data-filter="workflow">Workflow orchestration</button>
+    <button class="filter" data-filter="infra">Infrastructure</button>
+  </div>
+</header>
+<main>
+
+  <!-- ═══════════════════ KPI STRIP ═══════════════════ -->
+  <section class="grid4" data-group="workflow runner vm monorepo infra">
+    <div class="kpi"><div class="l">Python LOC</div><div class="v">45.9K</div><div class="small">src/ (36.9K) + webui/ (9K) + scripts/ &mdash; 88 src files, 25 webui files.</div></div>
+    <div class="kpi"><div class="l">Test functions</div><div class="v">1,762</div><div class="small">67 test files, 2,309 total with parametrize &mdash; 2,309 passed, 93 skipped.</div></div>
+    <div class="kpi"><div class="l">CI/CD workflows</div><div class="v">17</div><div class="small">lint, test, UI smoke, PDF validate, benchmark, release, VM lifecycle &amp; more.</div></div>
+    <div class="kpi"><div class="l">API endpoints</div><div class="v">65+</div><div class="small">8 router tags, 18 API modules, 11 HTML pages, Discord-style dual theme.</div></div>
+  </section>
+
+  <!-- ═══════════════════ ARCHITECTURE MAP ═══════════════════ -->
+  <section class="card" data-group="monorepo">
+    <h2>Interactive architecture map</h2>
+    <p class="small">Single integrated engineering diagram. The repo sits on a VPS host behind nginx + Cloudflare, with GitHub Actions as the control plane. Recommended docker-* runtime split shown at bottom.</p>
+    <div class="chart">
+      <svg viewBox="0 0 1800 1260" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arr" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L10,3 L0,6 z" fill="#72ddf7"/></marker>
+          <marker id="arrg" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L10,3 L0,6 z" fill="#9be37c"/></marker>
+          <marker id="arry" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L10,3 L0,6 z" fill="#ffd166"/></marker>
+          <marker id="arrp" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L10,3 L0,6 z" fill="#ff8fca"/></marker>
+          <marker id="arrv" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L10,3 L0,6 z" fill="#b49cff"/></marker>
+        </defs>
+        <rect x="20" y="20" width="1760" height="1220" rx="28" fill="#0b1730" stroke="#35598f" stroke-width="2"/>
+        <text x="55" y="60" fill="#eef4ff" font-size="28" font-weight="700">Integrated technical system view &mdash; v0.2.0 (June 2026)</text>
+
+        <!-- CLOUDFLARE + NGINX EDGE (new) -->
+        <g id="node-infra" data-filter="infra">
+          <rect x="340" y="82" width="1120" height="88" rx="16" fill="#1a1535" stroke="#7c5cbf"/>
+          <text x="374" y="116" fill="#b49cff" font-size="22" font-weight="700">Edge / infrastructure layer</text>
+          <text x="374" y="146" fill="#eef4ff" font-size="15">Cloudflare (TLS termination, DDoS, caching) &rarr; nginx reverse proxy (port 80/443) &rarr; uvicorn (application port)</text>
+        </g>
+
+        <!-- REPO SOURCE PLANE -->
+        <g id="node-monorepo" data-filter="monorepo">
+          <rect x="340" y="192" width="1120" height="108" rx="16" fill="#132443" stroke="#557bb7"/>
+          <text x="374" y="226" fill="#72ddf7" font-size="22" font-weight="700">Repository source plane on dev</text>
+          <text x="374" y="254" fill="#eef4ff" font-size="15">.github data docs eval gpu_monitor llm_router rag rate_limiter scripts src system_prompts tests tools utils webui</text>
+          <text x="374" y="278" fill="#eef4ff" font-size="15">src/: config &middot; configs &middot; generators &middot; integrations &middot; pipelines &middot; translator_v3 &middot; utils &middot; validators</text>
+        </g>
+
+        <!-- DOCUMENT PIPELINE -->
+        <g id="node-pipeline" data-filter="pipeline">
+          <rect x="40" y="360" width="380" height="230" rx="16" fill="#1b284a" stroke="#6f83c1"/>
+          <text x="72" y="394" fill="#ff8fca" font-size="22" font-weight="700">Document pipeline</text>
+          <text x="72" y="422" fill="#eef4ff" font-size="15">src/pipelines</text>
+          <text x="72" y="444" fill="#eef4ff" font-size="15">src/generators</text>
+          <text x="72" y="466" fill="#eef4ff" font-size="15">src/validators</text>
+          <text x="72" y="488" fill="#eef4ff" font-size="15">src/integrations</text>
+          <text x="72" y="510" fill="#eef4ff" font-size="15">src/translator_v3</text>
+          <text x="72" y="556" fill="#b8c7e6" font-size="14">Normalization, generation, validation, formatting, translation, artifact checks</text>
+        </g>
+
+        <!-- RAG / LLM ROUTING -->
+        <g id="node-rag" data-filter="rag">
+          <rect x="470" y="360" width="380" height="230" rx="16" fill="#1b284a" stroke="#6f83c1"/>
+          <text x="502" y="394" fill="#72ddf7" font-size="22" font-weight="700">Retrieval / LLM routing</text>
+          <text x="502" y="422" fill="#eef4ff" font-size="15">rag/</text>
+          <text x="502" y="444" fill="#eef4ff" font-size="15">llm_router/</text>
+          <text x="502" y="466" fill="#eef4ff" font-size="15">rate_limiter/</text>
+          <text x="502" y="488" fill="#eef4ff" font-size="15">system_prompts/</text>
+          <text x="502" y="556" fill="#b8c7e6" font-size="14">Context assembly, prompt contracts, provider routing, quota and throughput control</text>
+        </g>
+
+        <!-- UI SURFACE -->
+        <g id="node-ui" data-filter="ui">
+          <rect x="900" y="360" width="340" height="230" rx="16" fill="#1b284a" stroke="#6f83c1"/>
+          <text x="932" y="394" fill="#ffd166" font-size="22" font-weight="700">UI surface</text>
+          <text x="932" y="422" fill="#eef4ff" font-size="15">webui/main.py (FastAPI)</text>
+          <text x="932" y="444" fill="#eef4ff" font-size="15">webui/api/ (18 modules)</text>
+          <text x="932" y="466" fill="#eef4ff" font-size="15">webui/static/ (11 pages, 7.8K LOC)</text>
+          <text x="932" y="488" fill="#eef4ff" font-size="15">classifier, judge, corpus, closed_loop</text>
+          <text x="932" y="510" fill="#eef4ff" font-size="15">conversations, rag_results, autocomplete</text>
+          <text x="932" y="556" fill="#b8c7e6" font-size="14">Discord-style dual theme, live CI/CD, Perplexity-style RAG chat</text>
+        </g>
+
+        <!-- EVAL / BENCHMARK (new) -->
+        <g id="node-eval" data-filter="eval">
+          <rect x="1290" y="360" width="280" height="230" rx="16" fill="#1b284a" stroke="#6f83c1"/>
+          <text x="1322" y="394" fill="#b49cff" font-size="22" font-weight="700">Eval / benchmark</text>
+          <text x="1322" y="422" fill="#eef4ff" font-size="15">eval/run_benchmark.py</text>
+          <text x="1322" y="444" fill="#eef4ff" font-size="15">eval/dashboard.py</text>
+          <text x="1322" y="466" fill="#eef4ff" font-size="15">eval/runners/</text>
+          <text x="1322" y="488" fill="#eef4ff" font-size="15">eval/metrics/</text>
+          <text x="1322" y="510" fill="#eef4ff" font-size="15">eval/query_bank/</text>
+          <text x="1322" y="556" fill="#b8c7e6" font-size="14">Model quality regression detection and automated benchmarking</text>
+        </g>
+
+        <!-- GITHUB ACTIONS CONTROL PLANE -->
+        <g id="node-workflow" data-filter="workflow">
+          <rect x="1620" y="192" width="140" height="540" rx="16" fill="#0e2e1a" stroke="#4caf7c"/>
+          <text x="1636" y="222" fill="#9be37c" font-size="18" font-weight="700" transform="rotate(90,1750,480)">GitHub Actions &mdash; 17 workflows</text>
+          <text x="1644" y="250" fill="#b8c7e6" font-size="12">validate-md</text>
+          <text x="1644" y="268" fill="#b8c7e6" font-size="12">validate-pdf</text>
+          <text x="1644" y="286" fill="#b8c7e6" font-size="12">validate-pdf-units</text>
+          <text x="1644" y="304" fill="#b8c7e6" font-size="12">cross-reference</text>
+          <text x="1644" y="322" fill="#b8c7e6" font-size="12">run-tests</text>
+          <text x="1644" y="340" fill="#b8c7e6" font-size="12">lint</text>
+          <text x="1644" y="358" fill="#b8c7e6" font-size="12">lint-html-css</text>
+          <text x="1644" y="376" fill="#b8c7e6" font-size="12">ui-smoke</text>
+          <text x="1644" y="394" fill="#b8c7e6" font-size="12">benchmark</text>
+          <text x="1644" y="412" fill="#b8c7e6" font-size="12">generate-pdf</text>
+          <text x="1644" y="430" fill="#b8c7e6" font-size="12">release</text>
+          <text x="1644" y="448" fill="#b8c7e6" font-size="12">auto-pr</text>
+          <text x="1644" y="466" fill="#b8c7e6" font-size="12">system-pipeline</text>
+          <text x="1644" y="484" fill="#b8c7e6" font-size="12">runner-lifecycle</text>
+          <text x="1644" y="502" fill="#b8c7e6" font-size="12">vm-provisioner</text>
+          <text x="1644" y="520" fill="#b8c7e6" font-size="12">vm-scheduled-guard</text>
+          <text x="1644" y="538" fill="#b8c7e6" font-size="12">wake-before-run</text>
+        </g>
+
+        <!-- RUNNER / HOST SUBSTRATE -->
+        <g id="node-runner" data-filter="runner">
+          <rect x="40" y="660" width="620" height="230" rx="16" fill="#132443" stroke="#557bb7"/>
+          <text x="72" y="694" fill="#ffb86b" font-size="22" font-weight="700">Helper-runner / host substrate</text>
+          <text x="72" y="724" fill="#eef4ff" font-size="15">application root (git repo)</text>
+          <text x="72" y="746" fill="#eef4ff" font-size="15">.env (API keys + configuration)</text>
+          <text x="72" y="768" fill="#eef4ff" font-size="15">GCP service account key (GPU VM lifecycle)</text>
+          <text x="72" y="790" fill="#eef4ff" font-size="15">.venv/ (uvicorn, fastapi, chromadb, etc.)</text>
+          <text x="72" y="812" fill="#eef4ff" font-size="15">systemd: legal-doc-tools.service (uvicorn :3080)</text>
+          <text x="72" y="834" fill="#eef4ff" font-size="15">nginx: reverse proxy, /health bypass, 50M upload</text>
+          <text x="72" y="870" fill="#b8c7e6" font-size="14">Host context is production behavior, not CI convenience. Docker extraction must preserve these boundaries.</text>
+        </g>
+
+        <!-- VM LIFECYCLE -->
+        <g id="node-vm" data-filter="vm">
+          <rect x="710" y="660" width="560" height="230" rx="16" fill="#132443" stroke="#557bb7"/>
+          <text x="742" y="694" fill="#ffd166" font-size="22" font-weight="700">Infrastructure lifecycle plane</text>
+          <text x="742" y="724" fill="#eef4ff" font-size="15">runner-lifecycle.yml</text>
+          <text x="742" y="746" fill="#eef4ff" font-size="15">vm-provisioner.yml</text>
+          <text x="742" y="768" fill="#eef4ff" font-size="15">vm-scheduled-guard.yml</text>
+          <text x="742" y="790" fill="#eef4ff" font-size="15">wake-before-run.yml</text>
+          <text x="742" y="812" fill="#eef4ff" font-size="15">system-pipeline.yml (orchestrator)</text>
+          <text x="742" y="870" fill="#b8c7e6" font-size="14">Explicit compute readiness and runner availability managed through Actions. Remains operator plane after containerization.</text>
+        </g>
+
+        <!-- RECOMMENDED DOCKER SPLIT -->
+        <g id="node-target" data-filter="monorepo pipeline rag ui workflow runner vm eval infra">
+          <rect x="40" y="960" width="1720" height="100" rx="16" fill="#1b284a" stroke="#6f83c1"/>
+          <text x="75" y="998" fill="#72ddf7" font-size="22" font-weight="700">Recommended docker-* runtime split</text>
+          <text x="75" y="1028" fill="#eef4ff" font-size="15">webui (thin edge) &middot; core-api (sync control) &middot; retrieval-router (RAG + LLM) &middot; worker-validator (heavy artifacts) &middot; eval-suite (benchmarks) &middot; ops/helper (workflow-led)</text>
+          <text x="75" y="1052" fill="#b8c7e6" font-size="14">Keep GitHub Actions as control plane; externalize mutable state; separate UI, token throughput, and heavy artifact jobs.</text>
+        </g>
+
+        <!-- CONNECTION ARROWS -->
+        <line x1="900" y1="170" x2="230" y2="360" stroke="#b49cff" stroke-width="3" marker-end="url(#arrv)"/>
+        <line x1="900" y1="170" x2="660" y2="360" stroke="#72ddf7" stroke-width="3" marker-end="url(#arr)"/>
+        <line x1="900" y1="170" x2="1070" y2="360" stroke="#ffd166" stroke-width="3" marker-end="url(#arry)"/>
+        <line x1="900" y1="170" x2="1430" y2="360" stroke="#b49cff" stroke-width="3" marker-end="url(#arrv)"/>
+        <line x1="1700" y1="320" x2="1700" y2="360" stroke="#9be37c" stroke-width="3" marker-end="url(#arrg)"/>
+        <line x1="1550" y1="590" x2="350" y2="660" stroke="#ffd166" stroke-width="3" marker-end="url(#arry)"/>
+        <line x1="1550" y1="590" x2="990" y2="660" stroke="#ffd166" stroke-width="3" marker-end="url(#arry)"/>
+        <line x1="230" y1="590" x2="350" y2="960" stroke="#ff8fca" stroke-width="3" marker-end="url(#arrp)"/>
+        <line x1="660" y1="590" x2="600" y2="960" stroke="#72ddf7" stroke-width="3" marker-end="url(#arr)"/>
+        <line x1="1070" y1="590" x2="200" y2="960" stroke="#ffd166" stroke-width="3" marker-end="url(#arry)"/>
+        <line x1="1430" y1="590" x2="1000" y2="960" stroke="#b49cff" stroke-width="3" marker-end="url(#arrv)"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ CHARTS ═══════════════════ -->
+  <section class="grid" data-group="workflow monorepo eval">
+    <div class="card">
+      <h2>Workflow category distribution (v2)</h2>
+      <p class="small">17 workflows now cluster into 5 categories. The addition of <code>lint.yml</code>, <code>benchmark.yml</code>, and the <code>workflows</code> meta-trigger shifts the balance toward QA coverage.</p>
+      <div class="chart">
+        <svg viewBox="0 0 760 380" xmlns="http://www.w3.org/2000/svg" aria-label="Workflow category chart v2">
+          <text x="40" y="36" fill="#eef4ff" font-size="22" font-weight="700">Workflow categories (17 total)</text>
+          <line x1="80" y1="300" x2="700" y2="300" stroke="#45689c" stroke-width="2"/>
+          <line x1="80" y1="60" x2="80" y2="300" stroke="#45689c" stroke-width="2"/>
+          <text x="50" y="304" fill="#9eb2d7" font-size="13">0</text>
+          <text x="50" y="240" fill="#9eb2d7" font-size="13">2</text>
+          <text x="50" y="180" fill="#9eb2d7" font-size="13">4</text>
+          <text x="50" y="120" fill="#9eb2d7" font-size="13">6</text>
+          <!-- Validation: 4 (validate-md, validate-pdf, validate-pdf-units, cross-reference) -->
+          <rect x="100" y="180" width="80" height="120" rx="10" fill="#ff8fca"/>
+          <text x="127" y="168" fill="#eef4ff" font-size="18" font-weight="700">4</text>
+          <!-- QA/Release: 5 (run-tests, lint, lint-html-css, ui-smoke, benchmark, release, auto-pr, generate-pdf) -->
+          <rect x="230" y="120" width="80" height="180" rx="10" fill="#72ddf7"/>
+          <text x="257" y="108" fill="#eef4ff" font-size="18" font-weight="700">6</text>
+          <!-- Orchestration: 2 (system-pipeline, runner-lifecycle) -->
+          <rect x="370" y="240" width="80" height="60" rx="10" fill="#9be37c"/>
+          <text x="397" y="228" fill="#eef4ff" font-size="18" font-weight="700">2</text>
+          <!-- Infra lifecycle: 4 (vm-provisioner, vm-scheduled-guard, wake-before-run, benchmark) -->
+          <rect x="510" y="180" width="80" height="120" rx="10" fill="#ffd166"/>
+          <text x="537" y="168" fill="#eef4ff" font-size="18" font-weight="700">4</text>
+          <!-- Eval: 1 (benchmark) -- counted in QA above, showing eval separately -->
+          <rect x="640" y="270" width="80" height="30" rx="10" fill="#b49cff"/>
+          <text x="652" y="258" fill="#eef4ff" font-size="18" font-weight="700">1</text>
+          <text x="90" y="330" fill="#eef4ff" font-size="13">Validation</text>
+          <text x="218" y="330" fill="#eef4ff" font-size="13">QA / Release</text>
+          <text x="366" y="330" fill="#eef4ff" font-size="13">Orchestration</text>
+          <text x="500" y="330" fill="#eef4ff" font-size="13">Infra lifecycle</text>
+          <text x="637" y="330" fill="#eef4ff" font-size="13">Eval</text>
+        </svg>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Code-domain concentration (v2)</h2>
+      <p class="small">5 engineering domains now. The <code>eval/</code> domain was missing from v1. Root-level config files and <code>data/</code> storage added as cross-cutting concerns.</p>
+      <div class="chart">
+        <svg viewBox="0 0 760 400" xmlns="http://www.w3.org/2000/svg" aria-label="Code domain chart v2">
+          <text x="40" y="36" fill="#eef4ff" font-size="22" font-weight="700">Code-domain grouping (5 domains)</text>
+          <circle cx="220" cy="215" r="130" fill="#132443" stroke="#40679f" stroke-width="2"/>
+          <path d="M220 215 L220 85 A130 130 0 0 1 332 150 Z" fill="#72ddf7"/>
+          <path d="M220 215 L332 150 A130 130 0 0 1 318 312 Z" fill="#ff8fca"/>
+          <path d="M220 215 L318 312 A130 130 0 0 1 105 296 Z" fill="#9be37c"/>
+          <path d="M220 215 L105 296 A130 130 0 0 1 115 125 Z" fill="#ffd166"/>
+          <path d="M220 215 L115 125 A130 130 0 0 1 220 85 Z" fill="#b49cff"/>
+          <text x="390" y="90" fill="#72ddf7" font-size="16" font-weight="700">Retrieval / routing</text>
+          <text x="390" y="112" fill="#b8c7e6" font-size="13">rag, llm_router, rate_limiter, system_prompts</text>
+          <text x="390" y="152" fill="#ff8fca" font-size="16" font-weight="700">Document engine</text>
+          <text x="390" y="174" fill="#b8c7e6" font-size="13">pipelines, generators, validators, integrations, translator_v3</text>
+          <text x="390" y="214" fill="#9be37c" font-size="16" font-weight="700">Ops / support</text>
+          <text x="390" y="236" fill="#b8c7e6" font-size="13">gpu_monitor, utils, scripts, tools, tests, data</text>
+          <text x="390" y="276" fill="#ffd166" font-size="16" font-weight="700">UI / edge</text>
+          <text x="390" y="298" fill="#b8c7e6" font-size="13">webui (main.py, api/, static/), nginx, systemd</text>
+          <text x="390" y="338" fill="#b49cff" font-size="16" font-weight="700">Eval / benchmark</text>
+          <text x="390" y="360" fill="#b8c7e6" font-size="13">eval/ (run_benchmark, dashboard, runners, metrics, query_bank)</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ DOMAIN DEEP-DIVES ═══════════════════ -->
+  <section class="grid3" data-group="pipeline rag ui eval">
+    <div class="zone" data-group="pipeline">
+      <h3>Document pipeline <span class="tag">runtime-heavy</span></h3>
+      <p>Inferred from <code>src/pipelines</code>, <code>src/generators</code>, <code>src/validators</code>, <code>src/integrations</code>, and <code>translator_v3</code>. Reinforced by validation and PDF workflows that indicate artifact-oriented stages rather than a single request/response code path.</p>
+      <details open><summary>Engineering consequences</summary><p>Separate synchronous control APIs from asynchronous artifact workers. Treat validation, rendering, and format checking as queueable workloads rather than UI-coupled operations. The generate-pdf workflow proves these are independently invocable stages.</p></details>
+      <details><summary>Likely responsibilities</summary><p>Section transformation, prompt-backed generation, document integrity checks, translation, format normalization, PDF production, and reference verification. Cross-reference-check workflow validates inter-document consistency.</p></details>
+    </div>
+    <div class="zone" data-group="rag">
+      <h3>RAG / LLM routing <span class="tag">latency-sensitive</span></h3>
+      <p>The coexistence of <code>rag/</code>, <code>llm_router/</code>, <code>rate_limiter/</code>, and <code>system_prompts/</code> indicates an explicit model-access subsystem, not a simple library call pattern. The rate_limiter module is wired as FastAPI middleware protecting <code>/api/</code> endpoints.</p>
+      <details open><summary>Engineering consequences</summary><p>Give this its own service boundary so provider credentials (Gemini API key), retries, quotas, prompt versions, and throughput metrics are decoupled from UI scaling and document batch jobs. The middleware-based rate limiter already assumes this isolation in its path-prefix design.</p></details>
+      <details><summary>Likely responsibilities</summary><p>Retrieval assembly (ChromaDB), provider selection (Gemini), prompt-contract enforcement, budget control via rate_limiter middleware, and backpressure management. Jurisdiction-specific system prompt selection is handled through the <code>system_prompts/</code> directory.</p></details>
+    </div>
+    <div class="zone" data-group="ui">
+      <h3>UI surface <span class="tag">edge-facing</span></h3>
+      <p><code>webui/</code> is a multi-module FastAPI application, not a single file. It contains <code>main.py</code> (routes + auth middleware), <code>api_chat.py</code> (SSE streaming + RAG), <code>api_docs.py</code> (GitHub/GDrive/RAG document management), <code>gdrive_ingestor.py</code>, and an <code>api/</code> package with 11 modules including autocomplete, charge mapping, FIR drafting, pipeline control, and provider management.</p>
+      <details open><summary>Engineering consequences</summary><p>No direct provider secrets in the frontend. No embedded rendering pipeline in HTML. Keep it as an API client with server-side rendering. The HTTP Basic Auth middleware gates all app pages while leaving the landing page and /health endpoint public. The two-page architecture (public landing + auth-gated app) must be preserved during containerization.</p></details>
+      <details><summary>Likely responsibilities</summary><p>Session shell, submission forms, artifact status view, smoke-test target, operator-facing controls. The 6 HTML pages (index, app, chat, drafting, documents, jurisdiction, options) share a common navigation bar and are served as full-screen routes.</p></details>
+    </div>
+  </section>
+
+  <section class="grid" data-group="eval workflow">
+    <div class="zone" data-group="eval">
+      <h3>Eval / benchmark suite <span class="tag">quality-gate</span></h3>
+      <p>This entire domain was absent from the v1 layout. The <code>eval/</code> directory contains a structured benchmarking framework with <code>run_benchmark.py</code>, a results <code>dashboard.py</code>, configurable <code>runners/</code>, a <code>metrics/</code> collection, and a <code>query_bank/</code> for standardized test queries. The <code>benchmark.yml</code> workflow automates execution.</p>
+      <details open><summary>Engineering consequences</summary><p>This is a separate service concern. Benchmarks should not share container context with the webui or the retrieval-router. Model quality regressions can be detected independently of user traffic. The query bank represents a regression test suite for LLM outputs.</p></details>
+      <details><summary>Likely responsibilities</summary><p>Automated model comparison, response quality scoring, latency measurement, consistency checks, and historical result tracking. The dashboard provides a view into model performance over time.</p></details>
+    </div>
+    <div class="zone" data-group="eval workflow">
+      <h3>Workflow QA coverage</h3>
+      <p>The 17 workflows provide multi-layered quality assurance. Validation workflows (validate-md, validate-pdf, validate-pdf-units, cross-reference-check) run on every push. The lint workflow covers Python. lint-html-css covers the WebUI frontend. ui-smoke validates the deployed HTML pages. The benchmark workflow gates model quality.</p>
+      <details open><summary>Engineering consequences</summary><p>This QA layer must remain in GitHub Actions post-migration. Container services should expose health and smoke endpoints that these workflows can hit. The ui-smoke workflow already tests the live webui, proving the pattern works for container targets too.</p></details>
+      <details><summary>QA workflow mapping</summary>
+        <table>
+          <tr><th>Category</th><th>Workflows</th><th>Trigger</th></tr>
+          <tr><td>Content validation</td><td><code>validate-md</code>, <code>validate-pdf</code>, <code>validate-pdf-units</code>, <code>cross-reference-check</code></td><td>push, PR</td></tr>
+          <tr><td>Code quality</td><td><code>lint</code>, <code>lint-html-css</code>, <code>run-tests</code></td><td>push, PR</td></tr>
+          <tr><td>Integration</td><td><code>ui-smoke</code>, <code>benchmark</code></td><td>push, manual</td></tr>
+          <tr><td>Release</td><td><code>generate-pdf</code>, <code>release</code>, <code>auto-pr</code></td><td>tag, manual</td></tr>
+        </table>
+      </details>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ ROUTE MAP (new) ═══════════════════ -->
+  <section class="card" data-group="ui infra">
+    <h2>WebUI route map and authentication boundary</h2>
+    <p class="small">The two-page architecture splits the URL space into public and authenticated zones. HTTP Basic Auth middleware in <code>webui/main.py</code> enforces the boundary at the FastAPI level, before nginx.</p>
+    <table class="route-table">
+      <tr><th>Route</th><th>Serves</th><th>Auth</th><th>Notes</th></tr>
+      <tr><td><code>/</code></td><td>Landing page (index.html)</td><td>Public</td><td>Light theme, law background, status dashboard, "Enter Application" button</td></tr>
+      <tr><td><code>/health</code></td><td>JSON status</td><td>Public</td><td>Monitored by external services; excluded from auth middleware</td></tr>
+      <tr><td><code>/app</code></td><td>chat.html</td><td>Basic Auth</td><td>Primary authenticated entry point; was <code>/chat</code></td></tr>
+      <tr><td><code>/chat</code></td><td>301 redirect to /app</td><td>Basic Auth</td><td>Legacy URL preserved as redirect</td></tr>
+      <tr><td><code>/drafting</code></td><td>drafting.html</td><td>Basic Auth</td><td>Charge mapping + FIR drafting with sub-tabs</td></tr>
+      <tr><td><code>/documents</code></td><td>documents.html</td><td>Basic Auth</td><td>Document management (GitHub/GDrive/Local) + RAG query</td></tr>
+      <tr><td><code>/jurisdiction</code></td><td>jurisdiction.html</td><td>Basic Auth</td><td>Jurisdiction/language selector with system prompt preview</td></tr>
+      <tr><td><code>/options</code></td><td>options.html</td><td>Basic Auth</td><td>Model/GPU selection, RAG toggle, ChromaDB stats, data management</td></tr>
+      <tr><td><code>/config</code></td><td>JSON config</td><td>Basic Auth</td><td>Non-sensitive configuration info</td></tr>
+      <tr><td><code>/api/v1/*</code></td><td>API endpoints</td><td>Basic Auth</td><td>Chat, documents, autocomplete, pipeline, GPU, providers</td></tr>
+      <tr><td><code>/api/v1/docs/github/oauth-callback</code></td><td>OAuth redirect</td><td>Public</td><td>Must be accessible without auth for OAuth flow</td></tr>
+      <tr><td><code>/api/v1/docs/gdrive/oauth-callback</code></td><td>OAuth redirect</td><td>Public</td><td>Must be accessible without auth for OAuth flow</td></tr>
+      <tr><td><code>/static/*</code></td><td>Static assets</td><td>Basic Auth</td><td>HTML pages, CSS, JS, images served by StaticFiles mount</td></tr>
+    </table>
+    <div class="callout-warn"><p>OAuth callback paths are hardcoded exemptions in the auth middleware. If new OAuth providers are added, their callback paths must also be exempted. The <code>/health</code> and <code>/</code> paths are the only non-API public routes.</p></div>
+  </section>
+
+  <!-- ═══════════════════ RUNNER + INFRA ═══════════════════ -->
+  <section class="grid" data-group="runner vm workflow infra">
+    <div class="card" data-group="runner workflow">
+      <h2>Runner and helper-runner analysis</h2>
+      <p>The <code>System Pipeline</code> workflow shows the environment assumes a semi-persistent helper-runner rooted at a dedicated application directory, with local environment loading, optional virtualenv bootstrap, a GCP key path, and health inspection semantics. That means the current platform has real host dependencies that are part of production behavior.</p>
+      <div class="pillline">
+        <span>Host path dependency</span><span>.env sourcing</span><span>GCP key file</span><span>.venv recovery</span><span>Workflow restart dispatch</span><span>Service health checks</span><span>systemd management</span><span>nginx proxy</span>
+      </div>
+      <details><summary>Runtime context detail</summary>
+        <p>The application runs as a systemd service with <code>Restart=on-failure</code> and 5-second backoff. Uvicorn binds to localhost only, making nginx the sole external entry point. The nginx config proxies port 80 to this backend with WebSocket support, 50M upload limit, and disabled caching. Cloudflare handles TLS termination upstream. The <code>.env</code> file holds API keys and configuration (see private repo for variable names).</p>
+      </details>
+    </div>
+    <div class="card" data-group="vm workflow">
+      <h2>Infra lifecycle analysis</h2>
+      <p>The presence of <code>runner-lifecycle.yml</code>, <code>vm-provisioner.yml</code>, <code>vm-scheduled-guard.yml</code>, and <code>wake-before-run.yml</code> indicates the system manages compute readiness and runner availability explicitly through Actions. The GitHub workflow layer is already the operator control plane and should stay that way after runtime services are containerized.</p>
+      <div class="callout"><p>Do not move infra lifecycle semantics into arbitrary app startup scripts. Preserve the boundary: Actions orchestrate, services execute.</p></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ INFRASTRUCTURE DETAIL (new) ═══════════════════ -->
+  <section class="card" data-group="infra runner ui">
+    <h2>Infrastructure and deployment topology</h2>
+    <p class="small">This section was entirely absent from the v1 layout. The production runtime depends on a specific infrastructure chain that must be documented for any migration or handoff scenario.</p>
+    <div class="grid2">
+      <div class="zone">
+        <h3>Network path</h3>
+        <p>User browsers connect to <code>parselex.app</code> which resolves through Cloudflare's CDN. Cloudflare terminates TLS (TLSv1.2/1.3 only) and proxies to the VPS origin on port 80. The VPS runs nginx which reverse-proxies to the application server (uvicorn on localhost). The entire internal path is unencrypted HTTP on localhost.</p>
+      </div>
+      <div class="zone">
+        <h3>Service management</h3>
+        <p>The application runs as a systemd service with <code>Restart=on-failure</code> and 5-second backoff. Uvicorn binds to localhost only (not 0.0.0.0), making nginx the sole external entry point. The <code>WorkingDirectory</code> is the git repo root, so <code>git pull</code> on the host directly updates the running code after a service restart.</p>
+      </div>
+      <div class="zone">
+        <h3>nginx configuration</h3>
+        <p>The nginx site config sets a 50M <code>client_max_body_size</code> for legal document uploads, disables all caching (proxy_no_cache, no-store, must-revalidate), and adds security headers (X-Frame-Options DENY, X-Content-Type-Options nosniff, X-XSS-Protection). A dedicated <code>location /health</code> block bypasses the main proxy configuration. WebSocket upgrade is enabled for SSE streaming.</p>
+      </div>
+      <div class="zone">
+        <h3>Secrets and environment</h3>
+        <p>Credentials live in the application's <code>.env</code> file (loaded via python-dotenv) and a GCP service account key file for GPU VM management. Authentication is handled via HTTP Basic Auth gate (credentials in <code>.env</code>). LLM access and GCP variables enable GPU wake/shutdown through the API endpoint. See the private repository for full variable names and paths.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ MIGRATION MATRIX ═══════════════════ -->
+  <section class="card" data-group="monorepo workflow runner vm eval">
+    <h2>Migration target matrix (v2)</h2>
+    <div class="grid3">
+      <div class="zone"><h3>webui</h3><p>Thin FastAPI edge shell. Serves 7 HTML pages, 6 app routes, and proxies API calls. Holds auth middleware. Talks to internal APIs only. No direct LLM or rendering work.</p></div>
+      <div class="zone"><h3>core-api</h3><p>Owns synchronous control path for document jobs, status handling, and upload management. Includes the api/ modules for autocomplete, charge mapping, FIR drafting, and pipeline control.</p></div>
+      <div class="zone"><h3>retrieval-router</h3><p>Owns model access (Gemini), retrieval composition (ChromaDB), prompt policy (system_prompts/), provider selection (llm_router/), and throttling (rate_limiter/).</p></div>
+      <div class="zone"><h3>worker-validator</h3><p>Runs heavy render, validate, smoke, and batch-oriented document tasks from src/pipelines, src/generators, and src/validators. Queueable workloads.</p></div>
+      <div class="zone"><h3>eval-suite</h3><p>Independent benchmarking service. Contains run_benchmark.py, dashboard.py, runners/, metrics/, and query_bank/. Triggered by benchmark.yml workflow.</p></div>
+      <div class="zone"><h3>ops/helper jobs</h3><p>Stays workflow-led. GDrive sync (gdrive_ingestor.py), helper restart, health inspection, and VM lifecycle (wake/shutdown). Uses GCP key for VM management.</p></div>
+      <div class="zone"><h3>Storage split</h3><p>Separate immutable code (git), mutable artifacts (uploads/, results/), retrieval index (ChromaDB), and config state (.env, GCP key file) before final image hardening.</p></div>
+      <div class="zone"><h3>data/ directory</h3><p>Repository-adjacent data storage. Holds persistent datasets used by pipelines and RAG. Must be volume-mounted into containers, not baked into images.</p></div>
+      <div class="zone"><h3>docs/ directory</h3><p>Contains research and reporting documentation (e.g., research_reporting_options.md). Reference material, not runtime code. Can be served as static content or kept external.</p></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ FILE INVENTORY (new) ═══════════════════ -->
+  <section class="card" data-group="monorepo">
+    <h2>Complete file inventory</h2>
+    <p class="small">Verified against the GitHub dev tree. This replaces the incomplete listing in v1.</p>
+    <div class="grid2">
+      <div class="zone">
+        <h3>Root directories (16)</h3>
+        <p><code>.github/</code> &mdash; Actions workflows, dependabot config<br/>
+        <code>config/</code> &mdash; Configuration files and templates<br/>
+        <code>data/</code> &mdash; Persistent datasets for pipelines and RAG<br/>
+        <code>docs/</code> &mdash; Research and reporting documentation<br/>
+        <code>eval/</code> &mdash; Benchmarking framework (NEW in v2)<br/>
+        <code>gpu_monitor/</code> &mdash; GPU utilization tracking and metrics<br/>
+        <code>llm_router/</code> &mdash; LLM provider selection and routing<br/>
+        <code>rag/</code> &mdash; Retrieval-augmented generation with ChromaDB<br/>
+        <code>rate_limiter/</code> &mdash; API rate limiting middleware<br/>
+        <code>scripts/</code> &mdash; Operator and maintenance scripts<br/>
+        <code>src/</code> &mdash; Core document processing modules<br/>
+        <code>system_prompts/</code> &mdash; Jurisdiction-specific prompt templates<br/>
+        <code>tests/</code> &mdash; Unit and integration tests<br/>
+        <code>tools/</code> &mdash; Standalone CLI tools<br/>
+        <code>utils/</code> &mdash; Shared utility functions<br/>
+        <code>webui/</code> &mdash; FastAPI web application</p>
+      </div>
+      <div class="zone">
+        <h3>Root files</h3>
+        <p><code>.gitattributes</code> &mdash; Git line-ending and diff config<br/>
+        <code>.gitignore</code> &mdash; VCS exclusions<br/>
+        <code>.htmlvalidate.json</code> &mdash; HTML linting rules<br/>
+        <code>.stylelintrc.json</code> &mdash; CSS linting rules<br/>
+        <code>pyproject.toml</code> &mdash; Python project metadata and tool config<br/>
+        <code>requirements.txt</code> &mdash; Python dependency pins<br/>
+        <code>tagref.toml</code> &mdash; Cross-reference tag definitions</p>
+        <h3 style="margin-top:16px">webui/ structure (v2 detail)</h3>
+        <p><code>main.py</code> &mdash; FastAPI app, routes, auth middleware<br/>
+        <code>api_chat.py</code> &mdash; SSE chat with RAG<br/>
+        <code>api_docs.py</code> &mdash; Document source management<br/>
+        <code>gdrive_ingestor.py</code> &mdash; Google Drive integration<br/>
+        <code>api/</code> &mdash; 11 modules: autocomplete, charge_mapping, chat_mode, chat, config, documents, fir_draft, pipeline, providers, store, __init__<br/>
+        <code>static/</code> &mdash; 7 HTML pages, CSS, JS, images</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════ WHAT CHANGED (v1 to v2) ═══════════════════ -->
+  <section class="card" data-group="monorepo workflow infra ui eval">
+    <h2>What changed from v1 to v2</h2>
+    <div class="grid2">
+      <div class="zone">
+        <h3>Corrections</h3>
+        <p>Root directory count fixed: 12 &rarr; 16 (added <code>.github</code>, <code>.secrets</code>, <code>data</code>, <code>docs</code>, <code>eval</code>; removed erroneous count).</p>
+        <p>Workflow count fixed: 14 &rarr; 17 (added <code>lint.yml</code>, <code>benchmark.yml</code>, <code>workflows</code> meta-trigger; re-categorized existing workflows).</p>
+        <p>WebUI description corrected: was described as a single module; now documented as a multi-module FastAPI app with 11 API modules, 7 HTML pages, and auth middleware.</p>
+        <p>Workflow category chart corrected: validation was 6, now correctly 4. QA/Release now 6 (absorbed lint, benchmark, ui-smoke). Added eval category.</p>
+      </div>
+      <div class="zone">
+        <h3>Extensions</h3>
+        <p>Added <strong>eval/benchmark domain</strong> as a 5th code domain with full architecture map node, domain deep-dive, and migration target.</p>
+        <p>Added <strong>infrastructure topology</strong> section: Cloudflare &rarr; nginx &rarr; uvicorn chain, systemd service detail, nginx config detail, secrets management.</p>
+        <p>Added <strong>WebUI route map</strong>: complete table of all 14 routes with authentication status, serving behavior, and notes.</p>
+        <p>Added <strong>complete file inventory</strong>: all 16 root directories and 7 root files with descriptions; detailed webui/ structure.</p>
+        <p>Added <strong>"Infrastructure" filter</strong> and <strong>"Eval" filter</strong> to the interactive toolbar.</p>
+        <p>Extended <strong>migration target matrix</strong> from 6 to 9 cells (added eval-suite, data/, docs/).</p>
+        <p>Added <strong>QA workflow mapping table</strong> showing trigger relationships.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+<script>
+(function(){
+  const buttons=[...document.querySelectorAll('.filter')];
+  function matchGroup(value, attr){
+    if(!attr) return value==='all';
+    if(value==='all') return true;
+    return attr.split(/\s+/).includes(value);
+  }
+  function apply(value){
+    buttons.forEach(btn=>btn.classList.toggle('active', btn.dataset.filter===value));
+    document.querySelectorAll('[data-group]').forEach(el=>{
+      el.classList.toggle('hidden', !matchGroup(value, el.dataset.group));
+    });
+    document.querySelectorAll('g[data-filter]').forEach(el=>{
+      const ok = matchGroup(value, el.dataset.filter);
+      el.style.opacity = ok ? '1' : '0.12';
+      el.style.filter = ok ? 'none' : 'grayscale(0.75)';
+    });
+  }
+  buttons.forEach(btn=>btn.addEventListener('click', ()=>apply(btn.dataset.filter)));
+  apply('all');
+})();
+</script>
+</body>
+</html>
