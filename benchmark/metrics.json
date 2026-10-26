@@ -1,0 +1,24 @@
+{
+  "retrieval": {},
+  "generation": {
+    "gemini-flash": {
+      "avg_latency_ms": 12435.67,
+      "avg_tokens": 1752.61,
+      "avg_length": 3499.0,
+      "avg_word_overlap": 0.4096,
+      "avg_keyword_recall": 0.4564,
+      "pct_contains_gold": 0.0
+    }
+  },
+  "query_count": 20,
+  "providers_tested": [
+    "gemini-flash"
+  ],
+  "ragas": {
+    "faithfulness": null,
+    "answer_relevancy": null,
+    "context_precision": null,
+    "context_recall": null,
+    "queries_scored": 18
+  }
+}
