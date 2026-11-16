@@ -1,0 +1,161 @@
+name: history-reset
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Periodically makes ALL git history on GitHub invisible to the public.
+#
+# What it does (in order):
+#   1. deletes every release (and its tag),
+#   2. deletes every remaining tag,
+#   3. deletes every branch except the default one,
+#   4. force-pushes the current tree as ONE brand-new orphan commit,
+#   5. verifies that both production sites still respond with HTTP 200:
+#      https://docs.parselex.app/  and  https://parselex.app/
+#      (up to 8 attempts with 20s pause — ~2.5 min tolerance),
+#   6. deletes old Actions run logs (they may expose old commit data).
+#
+# Result: the repo shows a single commit; all previous commits become
+# unreachable on GitHub. Site content is unchanged (tree stays identical).
+#
+# Runs:
+#   - every Monday 02:17 UTC (weekly; for monthly use "17 2 1 * *")
+#   - on demand: Actions → history-reset → Run workflow → type RESET
+#     (must be launched from the default branch)
+#
+# Requirements:
+#   - Works out of the box with the built-in GITHUB_TOKEN as long as the
+#     default branch has NO branch-protection rule that forbids force-push.
+#   - If protection IS enabled: create a fine-grained PAT (Contents: R/W,
+#     Actions: R/W), add it to the ruleset "bypass" list, store it as the
+#     repo secret HISTORY_RESET_TOKEN — this workflow automatically prefers
+#     that secret over GITHUB_TOKEN.
+#
+# Limits to be aware of:
+#   - Local clones keep the old history — they are the only backup.
+#     Push all local work BEFORE the next scheduled reset.
+#   - GitHub can serve old commits by raw SHA from internal caches for some
+#     time after a force-push, and forks keep their own copies. For hard
+#     privacy cases also ask GitHub Support to purge cached views.
+#   - Open PRs referencing old commits will break; issues keep their text.
+# ─────────────────────────────────────────────────────────────────────────────
+
+on:
+  schedule:
+    - cron: "17 2 * * 1" # weekly, Monday 02:17 UTC (monthly: "17 2 1 * *")
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: 'Type "RESET" to wipe full history now'
+        required: true
+        default: ""
+
+permissions:
+  contents: write # force-push + tag/release deletion
+  actions: write # delete old workflow runs
+
+concurrency:
+  group: history-reset
+  cancel-in-progress: false
+
+jobs:
+  reset:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Guard manual runs (default branch + confirm=RESET only)
+        if: >-
+          github.event_name == 'workflow_dispatch' &&
+          (inputs.confirm != 'RESET' || github.ref_name != github.event.repository.default_branch)
+        run: |
+          echo "Aborting: manual runs must be launched from the default branch with confirm=RESET."
+          exit 1
+
+      - name: Checkout current tree
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.HISTORY_RESET_TOKEN || github.token }}
+          persist-credentials: true
+          fetch-depth: 1
+
+      - name: Wipe releases, tags and non-default branches
+        env:
+          GH_TOKEN: ${{ secrets.HISTORY_RESET_TOKEN || github.token }}
+        run: |
+          set -euo pipefail
+          DEFAULT_BRANCH="${{ github.event.repository.default_branch }}"
+          DEFAULT_BRANCH="${DEFAULT_BRANCH:-main}"
+          echo "==> default branch: ${DEFAULT_BRANCH}"
+
+          # releases (also removes their tags)
+          gh release list --limit 1000 --json tagName --jq '.[].tagName' \
+            | while read -r t; do
+                [ -n "$t" ] && gh release delete "$t" --yes --cleanup-tag || true
+              done
+
+          # remaining tags
+          git ls-remote --tags origin \
+            | awk '{print $2}' \
+            | sed -e 's|^refs/tags/||' -e 's/\^{}$//' \
+            | sort -u \
+            | while read -r t; do
+                [ -n "$t" ] && git push origin --delete "refs/tags/$t" || true
+              done
+
+          # every branch except the default one
+          git ls-remote --heads origin \
+            | awk '{print $2}' \
+            | sed 's|^refs/heads/||' \
+            | while read -r b; do
+                [ "$b" = "$DEFAULT_BRANCH" ] || git push origin --delete "refs/heads/$b" || true
+              done
+          echo "==> branches / tags / releases wiped"
+
+      - name: Replace history with a single orphan commit
+        run: |
+          set -euo pipefail
+          DEFAULT_BRANCH="${{ github.event.repository.default_branch }}"
+          DEFAULT_BRANCH="${DEFAULT_BRANCH:-main}"
+          git config user.name  "parselex-reset-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan reset-main
+          git add -A
+          git commit -m "chore: full history reset ($(date -u '+%Y-%m-%d'))"
+          git push --force origin "HEAD:${DEFAULT_BRANCH}"
+          echo "==> history replaced with a single commit on ${DEFAULT_BRANCH}"
+
+      - name: Verify sites respond after reset
+        run: |
+          set -euo pipefail
+          check() {
+            local url="$1" name="$2" code=""
+            for i in 1 2 3 4 5 6 7 8; do
+              code="$(curl -sS -o /dev/null -m 15 -w '%{http_code}' "$url" 2>/dev/null || true)"
+              if [ "$code" = "200" ]; then
+                echo "OK  $name ($url) -> 200"
+                return 0
+              fi
+              echo "retry $i/8: $name -> ${code:-no-response} (waiting 20s)"
+              sleep 20
+            done
+            echo "FAIL $name ($url): last code ${code:-none}"
+            return 1
+          }
+          FAILED=""
+          check "https://docs.parselex.app/" "docs.parselex.app" || FAILED="$FAILED docs.parselex.app"
+          check "https://parselex.app/" "parselex.app" || FAILED="$FAILED parselex.app"
+          if [ -n "$FAILED" ]; then
+            echo "==> SITE CHECK FAILED:$FAILED"
+            exit 1
+          fi
+          echo "==> both sites respond after reset"
+
+      - name: Delete old Actions run logs
+        env:
+          GH_TOKEN: ${{ secrets.HISTORY_RESET_TOKEN || github.token }}
+        run: |
+          # keep the run that is currently executing; everything older is removed
+          gh run list --limit 1000 --json databaseId \
+            --jq ".[] | select(.databaseId != ${GITHUB_RUN_ID}) | .databaseId" \
+            | while read -r id; do
+                gh run delete "$id" >/dev/null 2>&1 || true
+              done
+          echo "==> old run logs deleted"

@@ -1,0 +1,123 @@
+# =============================================================================
+# MkDocs Material configuration — Parselex Legal Doc Tools (static public docs)
+# =============================================================================
+# Builds to site/docs/ (see .github/workflows/deploy.yml).
+# Published at: https://parselex.github.io/legal-doc-tools-pages/docs/
+# Custom domain: https://docs.parselex.app/  (CNAME -> parselex.github.io)
+# =============================================================================
+
+site_name: Parselex Legal Doc Tools — Docs
+site_description: >-
+  Public documentation for the Parselex Legal Document Intelligence Platform.
+  Architecture, security, and benchmark reference.
+site_url: https://parselex.github.io/legal-doc-tools-pages/docs/
+
+repo_url: https://github.com/parselex/legal-doc-tools-pages
+repo_name: legal-doc-tools-pages
+edit_uri: edit/main/docs/
+
+# Docs live under /docs/ on the Pages site (landing is at /).
+# MkDocs Material needs use_directory_urls: true (default) for clean URLs.
+docs_dir: docs
+site_dir: site/docs
+
+theme:
+  name: material
+  language: en
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  favicon: assets/favicon.svg
+  logo: assets/favicon.svg
+  icon:
+    repo: fontawesome/brands/github
+
+# Legal footer — same 7 links as the landing footer. The theme renders
+# config.copyright as raw HTML (partials/copyright.html), styled via
+# docs/stylesheets/extra.css (.md-legal). Absolute paths because docs are
+# served under /docs/ on docs.parselex.app.
+copyright: >-
+  <nav class="md-legal" aria-label="Legal"><a href="/legal/privacy/">Privacy</a><a
+  href="/legal/personal-data/">Personal Data Use</a><a href="/legal/cookies/">Cookies</a><a
+  href="/legal/terms/">Terms of Service</a><a href="/legal/payments/">Recurring Payments</a><a
+  href="/legal/disclaimer/">AI Disclaimer</a><a
+  href="/security/">Security</a><a
+  href="mailto:contact@parselex.app">Support: contact@parselex.app</a></nav>
+  <p class="md-legal-line">&copy; 2026 Parselex &mdash; Legal Document Intelligence Platform</p>
+
+extra_css:
+  - stylesheets/extra.css
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/parselex/legal-doc-tools-pages
+      name: GitHub repository
+    - icon: material/web
+      link: https://parselex.app
+      name: Parselex live application
+  generator: false
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+nav:
+  - Home: index.md
+  - Security Architecture: security.md
+  - RAG Benchmark: benchmark.md
+
+plugins:
+  - search
+  - tags
