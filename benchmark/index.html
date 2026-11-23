@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Parselex — RAG Evaluation Dashboard</title>
+<script src="https://cdn.plot.ly/plotly-2.35.0.min.js"></script>
+<style>
+:root{--bg:#0a1022;--panel:#101936;--border:#27446f;--text:#eef4ff;--muted:#b8c7e6;
+--cyan:#72ddf7;--green:#9be37c;--gold:#ffd166;--pink:#ff8fca;--red:#ff6b6b}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font:15px/1.6 Inter,-apple-system,Segoe UI,Arial,sans-serif;padding:24px}
+header{padding:20px 24px;border-bottom:1px solid var(--border);margin:-24px -24px 24px}
+h1{font-size:28px;font-weight:800;letter-spacing:-.5px}
+h1 span{color:var(--cyan)}
+h2{font-size:18px;font-weight:600;margin:16px 0 8px;color:var(--muted)}
+.subtitle{font-size:13px;color:var(--muted);margin-top:4px}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:16px 0}
+.kpi-box{background:#13223d;border:1px solid var(--border);border-radius:14px;padding:16px;text-align:center}
+.kpi-box .val{font-size:26px;font-weight:800}
+.kpi-box .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-top:4px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px}
+.card-full{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:16px;margin-top:16px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{padding:10px 8px;text-align:left;border-bottom:2px solid var(--border);color:var(--cyan);cursor:pointer;user-select:none;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
+td{padding:8px;border-bottom:1px solid rgba(39,68,111,.4)}
+tr:hover{background:rgba(114,221,247,.04)}
+.badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700}
+.ragas-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:12px 0}
+.ragas-card{background:#13223d;border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center}
+.ragas-card .rv{font-size:22px;font-weight:800}
+.ragas-card .rl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+footer{font-size:12px;color:var(--muted);margin-top:24px;padding-top:16px;border-top:1px solid var(--border)}
+@media(max-width:768px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+<h1>Parselex <span>RAG Evaluation</span></h1>
+<p class="subtitle">Legal document corpus benchmark &mdash; 2026-08-31 16:40 UTC</p>
+</header>
+<main>
+
+<!-- KPI Row -->
+<div class="kpi">
+<div class="kpi-box"><div class="val" style="color:var(--cyan)">20</div><div class="lbl">Queries</div></div>
+<div class="kpi-box"><div class="val" style="color:var(--gold)">1</div><div class="lbl">Providers</div></div>
+<div class="kpi-box"><div class="val" style="color:var(--green)">12436ms</div><div class="lbl">Best Latency (gemini-flash)</div></div>
+<div class="kpi-box"><div class="val" style="color:var(--pink)">0.410</div><div class="lbl">Best Overlap (gemini-flash)</div></div>
+</div>
+
+<!-- RAGAS Scores -->
+<h2>LLM-as-Judge Metrics (RAGAS)</h2>
+<div class="ragas-grid">
+<div class="ragas-card"><div class="rv" style="color:var(--cyan)">0</div><div class="rl">Faithfulness</div></div>
+<div class="ragas-card"><div class="rv" style="color:var(--green)">0</div><div class="rl">Answer Relevancy</div></div>
+<div class="ragas-card"><div class="rv" style="color:var(--gold)">0</div><div class="rl">Context Precision</div></div>
+<div class="ragas-card"><div class="rv" style="color:var(--pink)">0</div><div class="rl">Context Recall</div></div>
+</div>
+
+<!-- Charts Row 1 -->
+<div class="grid">
+<div class="card"><h2>Latency Comparison</h2><div id="chart-latency"></div></div>
+<div class="card"><h2>Token Usage</h2><div id="chart-tokens"></div></div>
+</div>
+
+<!-- Charts Row 2 -->
+<div class="grid">
+<div class="card"><h2>Answer Quality (Word Overlap)</h2><div id="chart-quality"></div></div>
+<div class="card"><h2>Keyword Recall</h2><div id="chart-keywords"></div></div>
+</div>
+
+<!-- Radar Chart -->
+<div class="card-full"><h2>Provider Radar — Normalized Scores</h2><div id="chart-radar"></div></div>
+
+<!-- Heatmap -->
+<div class="card-full"><h2>Metric Heatmap</h2><div id="chart-heatmap"></div></div>
+
+<!-- Parallel Coordinates -->
+<div class="card-full"><h2>Parallel Coordinates — Multi-Dimensional Comparison</h2><div id="chart-parallel"></div></div>
+
+<!-- Sortable Table -->
+<div class="card-full"><h2>Provider Comparison Table</h2>
+<table id="comp-table">
+<thead><tr>
+<th onclick="sortTable(0)">Provider</th>
+<th onclick="sortTable(1)">Latency (ms)</th>
+<th onclick="sortTable(2)">Tokens</th>
+<th onclick="sortTable(3)">Word Overlap</th>
+<th onclick="sortTable(4)">Keyword Recall</th>
+<th onclick="sortTable(5)">Gold Hit %</th>
+</tr></thead><tbody><tr>
+<td><span class="badge" style="background:#4285f422;color:#4285f4;border:1px solid #4285f444">gemini-flash</span></td>
+<td>12435.7</td>
+<td>1752.6</td>
+<td>0.4096</td>
+<td>0.4564</td>
+<td>0.0%</td>
+</tr></tbody></table></div>
+
+<script>
+const providers = ["gemini-flash"];
+const genData = {"gemini-flash": {"avg_latency_ms": 12435.67, "avg_tokens": 1752.61, "avg_length": 3499.0, "avg_word_overlap": 0.4096, "avg_keyword_recall": 0.4564, "pct_contains_gold": 0.0}};
+const ragasData = {"faithfulness": 0, "answer_relevancy": 0, "context_precision": 0, "context_recall": 0, "queries_scored": 18};
+const pColors = {"gemini-flash": "#4285f4"};
+const darkLayout = {
+    paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)',
+    font: { color: '#eef4ff', size: 12 },
+    margin: { t: 30, b: 50, l: 50, r: 20 },
+};
+const gridCfg = { gridcolor: '#1e3255', zerolinecolor: '#1e3255' };
+
+function barChart(elId, key, title) {
+    if (!providers.length) return;
+    const data = providers.map(p => ({
+        x: [p], y: [genData[p][key] || 0],
+        type: 'bar', marker: { color: pColors[p] || '#72ddf7', cornerradius: 4 }, name: p,
+        hovertemplate: `<b>${p}</b><br>${title}: %{y}<extra></extra>`
+    }));
+    Plotly.newPlot(elId, data, {
+        ...darkLayout, barmode: 'group',
+        xaxis: { ...gridCfg }, yaxis: { ...gridCfg, title: { text: title, standalone: true } },
+    }, { responsive: true });
+}
+
+if (providers.length > 0) {
+    barChart('chart-latency', 'avg_latency_ms', 'Milliseconds');
+    barChart('chart-tokens', 'avg_tokens', 'Token Count');
+    barChart('chart-quality', 'avg_word_overlap', 'Overlap Score');
+    barChart('chart-keywords', 'avg_keyword_recall', 'Recall Score');
+}
+
+// Radar chart — normalize all metrics to 0-1
+if (providers.length >= 2) {
+    const radarMetrics = [
+        { key: 'avg_word_overlap', label: 'Word Overlap' },
+        { key: 'avg_keyword_recall', label: 'Keyword Recall' },
+        { key: 'pct_contains_gold', label: 'Gold Hit %', scale: 100 },
+        { key: 'avg_latency_ms', label: 'Speed (inv)', inv: true },
+    ];
+    const radarTraces = providers.map(p => {
+        const vals = radarMetrics.map(m => {
+            let v = genData[p][m.key] || 0;
+            if (m.inv) v = 1 / (1 + v / 1000);  // invert latency
+            if (m.scale) v = v / m.scale;
+            return Math.min(1, Math.max(0, v));
+        });
+        return { r: [...vals, vals[0]], theta: [...radarMetrics.map(m => m.label), radarMetrics[0].label],
+                 fill: 'toself', name: p, line: { color: pColors[p] || '#72ddf7' },
+                 marker: { size: 6 }, type: 'scatterpolar' };
+    });
+    Plotly.newPlot('chart-radar', radarTraces, {
+        ...darkLayout, polar: { radialaxis: { visible: true, range: [0, 1], ...gridCfg },
+        angularaxis: { color: '#b8c7e6' } },
+        showlegend: true, legend: { font: { color: '#b8c7e6' } },
+    }, { responsive: true });
+}
+
+// Heatmap
+if (providers.length > 0) {
+    const hmMetrics = [
+        { key: 'avg_word_overlap', label: 'Word Overlap' },
+        { key: 'avg_keyword_recall', label: 'Keyword Recall' },
+        { key: 'pct_contains_gold', label: 'Gold Hit %' },
+        { key: 'avg_latency_ms', label: 'Latency', inv: true },
+        { key: 'avg_tokens', label: 'Tokens', inv: true },
+    ];
+    // Add RAGAS metrics
+    if (ragasData.queries_scored) {
+        hmMetrics.push(
+            { key: 'faithfulness', label: 'Faithfulness', ragas: true },
+            { key: 'answer_relevancy', label: 'Relevancy', ragas: true },
+            { key: 'context_precision', label: 'Ctx Precision', ragas: true },
+            { key: 'context_recall', label: 'Ctx Recall', ragas: true },
+        );
+    }
+    const z = hmMetrics.map(m => providers.map(p => {
+        let v = m.ragas ? (ragasData[m.key] || 0) : (genData[p][m.key] || 0);
+        if (m.inv) v = 1 / (1 + v / 100);
+        if (m.key === 'pct_contains_gold') v = v / 100;
+        return Math.min(1, Math.max(0, v));
+    }));
+    Plotly.newPlot('chart-heatmap', [{
+        z, x: providers, y: hmMetrics.map(m => m.label),
+        type: 'heatmap', colorscale: [[0,'#1e3255'],[0.5,'#2196f3'],[1,'#72ddf7']],
+        hovertemplate: '<b>%{y}</b><br>%{x}: %{z:.3f}<extra></extra>',
+        showscale: true, colorbar: { tickfont: { color: '#b8c7e6' } },
+    }], { ...darkLayout, xaxis: { ...gridCfg }, yaxis: { ...gridCfg, autorange: 'reversed' } }, { responsive: true });
+}
+
+// Parallel Coordinates
+if (providers.length >= 2) {
+    const dims = [
+        { label: 'Word Overlap', values: providers.map(p => genData[p].avg_word_overlap || 0) },
+        { label: 'Keyword Recall', values: providers.map(p => genData[p].avg_keyword_recall || 0) },
+        { label: 'Gold Hit %', values: providers.map(p => (genData[p].pct_contains_gold || 0) / 100) },
+        { label: 'Latency (norm)', values: providers.map(p => 1 / (1 + (genData[p].avg_latency_ms || 0) / 500)) },
+    ];
+    if (ragasData.queries_scored) {
+        dims.push(
+            { label: 'Faithfulness', values: providers.map(() => ragasData.faithfulness || 0) },
+            { label: 'Relevancy', values: providers.map(() => ragasData.answer_relevancy || 0) },
+        );
+    }
+    Plotly.newPlot('chart-parallel', [{
+        type: 'parcoords', line: { color: providers.map((_, i) => i), colorscale: 'Bluered' },
+        dimensions: dims.map(d => ({ ...d, range: [0, 1] })),
+    }], { ...darkLayout }, { responsive: true });
+}
+
+// Sortable table
+function sortTable(col) {
+    const table = document.getElementById('comp-table');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    const asc = table.dataset.sortCol == col && table.dataset.sortDir !== 'asc';
+    table.dataset.sortCol = col;
+    table.dataset.sortDir = asc ? 'asc' : 'desc';
+    rows.sort((a, b) => {
+        let aVal = parseFloat(a.cells[col].textContent) || 0;
+        let bVal = parseFloat(b.cells[col].textContent) || 0;
+        return asc ? aVal - bVal : bVal - aVal;
+    });
+    rows.forEach(r => tbody.appendChild(r));
+}
+</script>
+<footer>Generated by eval/dashboard.py &mdash; parselex/legal-doc-tools &mdash; {ts}</footer>
+</main></body></html>
